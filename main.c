@@ -9,12 +9,14 @@
 #define BUFFER_SIZE 1024
 
 int chopCmd(char * cmd, char * tokens[]);
-int printPrompt ();
+void printPrompt ();
 void readInputs(char *cmd, char *arguments[], int *nArguments);
 bool processCommand(char *arguments[MAX], int nArguments);
 
-void cmdAuthors ();
-void cmdPid (char *arguments[MAX], int nArguments);
+void cmd_authors ();
+void cmd_pid (char *arguments[MAX], int nArguments);
+void cmd_chdir (char *arguments[MAX], int nArguments);
+
 
 int main() {
     bool quit;
@@ -24,7 +26,7 @@ int main() {
     int nArguments;
 
     do {
-        if (printPrompt() == 1) return 1;
+        printPrompt();
         readInputs(cmd, arguments, &nArguments);
         quit = processCommand(arguments, nArguments);
 
@@ -35,9 +37,9 @@ int main() {
 }
 
 
-int printPrompt () {
+void printPrompt () {
     char * userName = getenv("USER");
-    if (userName == NULL) return EXIT_FAILURE;
+    if (userName == NULL)  exit(EXIT_FAILURE);
     
     printf("[%s]>> ", userName);
 }
@@ -45,7 +47,6 @@ int printPrompt () {
 void readInputs(char *cmd, char *arguments[], int *nArguments) {
     ssize_t bytesRead;      // ssize_t y size_t son unsigned int
     size_t bufferSize = 0;
-    int i = 0;
 
     bytesRead = getline(&cmd, &bufferSize, stdin);      //getline devuelve el número de bytes escritos si no hay errores
 
@@ -72,17 +73,20 @@ bool processCommand(char *arguments[MAX], int nArguments) {
     // if (arguments[2] == NULL) printf("el dos apunta a null\n");
     // printf("%d arguments\n", nArguments);
 
-    if (strcmp(arguments[0], "authors") == 0) cmdAuthors(arguments, nArguments);
-    else if (strcmp(arguments[0], "pid") == 0) cmdPid(arguments, nArguments);
+    if (strcmp(arguments[0], "authors") == 0) cmd_authors(arguments, nArguments);
+    else if (strcmp(arguments[0], "pid") == 0) cmd_pid(arguments, nArguments);
+    else if (strcmp(arguments[0], "chdir") == 0) cmd_chdir(arguments, nArguments);
+
     else if (strcmp(arguments[0], "quit") == 0) return false;
     else if (strcmp(arguments[0], "bye") == 0) return false;
     else if (strcmp(arguments[0], "exit") == 0) return false;
+
     else printf("macaco escribe ben\n");
      
     return true;
 }
 
-void cmdAuthors (char *arguments[MAX], int nArguments) {
+void cmd_authors (char *arguments[MAX], int nArguments) {
     char authorsNames[] = "Iago Dani";
     char authorsLogins[] = "Iago@udc Dani@udc";
 
@@ -101,20 +105,56 @@ void cmdAuthors (char *arguments[MAX], int nArguments) {
     }
 }
 
-void cmdPid (char *arguments[MAX], int nArguments) {
-    pid_t pid = getpid(); 
-    pid_t ppid = getppid();
+void cmd_pid (char *arguments[MAX], int nArguments) {
 
     switch (nArguments) {
         case 1:
-            printf("Current process identifier: %d\n", pid);
+            printf("Current process identifier: %d\n", getpid());
             break;
         case 2:
-            if (strcmp(arguments[1], "-p") == 0) printf("Current process parent identifier: %d\n", ppid);
+            if (strcmp(arguments[1], "-l") == 0) printf("Current process parent identifier: %d\n", getppid());
             else printf("Error: Unexpected argument '%s' found\n", arguments[1]);
             break;
         default:
             printf("Error: Multiple arguements\n");
             break;
-        }
+    }
 }
+
+void cmd_chdir (char *arguments[MAX], int nArguments) {
+    char *cwd = (char *)malloc(sizeof(BUFFER_SIZE));
+    if (cwd == NULL) {
+        perror("Memory allocation error");
+        exit(EXIT_FAILURE);
+    }
+
+    switch (nArguments) {
+        case 1:
+            if (getcwd(cwd, BUFFER_SIZE) == NULL) {
+                perror("getcwd() error");
+                exit(EXIT_FAILURE);
+
+            } else {
+                // cwd = realloc(cwd, strlen(cwd) + 1);
+                // if (cwd == NULL) {
+                //     perror("Memory allocation error");
+                //     exit(EXIT_FAILURE);
+                // }
+                printf("Current working directory: %s\n", cwd);
+            }
+
+            free(cwd);
+            break;
+
+        case 2:
+            chdir(arguments[1]);
+            break;
+
+        default:
+            printf("Error: Multiple arguements\n");
+            break;
+        }
+    
+}
+
+
