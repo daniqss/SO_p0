@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 
 #define MAX 5
 #define BUFFER_SIZE 1024
@@ -29,47 +30,31 @@ int main() {
 
     } while (quit);
 
-
-    return 0;
+    free(cmd);
+    return EXIT_SUCCESS;
 }
 
 
 int printPrompt () {
     char * userName = getenv("USER");
     if (userName == NULL) return EXIT_FAILURE;
+    
     printf("[%s]>> ", userName);
 }
 
 void readInputs(char *cmd, char *arguments[], int *nArguments) {
+    ssize_t bytesRead;      // ssize_t y size_t son unsigned int
+    size_t bufferSize = 0;
     int i = 0;
 
-    cmd = malloc(sizeof(char) * BUFFER_SIZE);
-    fgets(cmd, BUFFER_SIZE, stdin);
-    //printf("%s\n", cmd);
+    bytesRead = getline(&cmd, &bufferSize, stdin);      //getline devuelve el número de bytes escritos si no hay errores
+
+    if (bytesRead == -1) {          
+        perror("Lectura fallida");
+        exit(EXIT_FAILURE);
+    }
 
     *nArguments = chopCmd(cmd, arguments);
-    // while (i < *nArguments) {
-    //         printf("%s\n", arguments[i]);
-    //         i++;
-    // }
-    //Tokeniza ben
-}
-
-bool processCommand(char *arguments[MAX], int nArguments) {
-    if (arguments[0] != NULL) printf("%s\n", arguments[0]);
-    if (arguments[1] != NULL) printf("%s\n", arguments[1]);
-    if (arguments[2] == NULL) printf("el dos apunta a null\n");
-    printf("%d arguments\n", nArguments);
-
-    if (strcmp(arguments[0], "authors") == 0) cmdAuthors(arguments, nArguments);
-    else if (strcmp(arguments[0], "pid") == 0) cmdPid(arguments, nArguments);
-    else if (strcmp(arguments[0], "quit") == 0) return false;
-    else if (strcmp(arguments[0], "bye") == 0) return false;
-    else if (strcmp(arguments[0], "exit") == 0) return false;
-    else printf("macaco escribe ben");
-     
-    printf("nashe");
-    return true;
 }
 
 int chopCmd(char * cmd, char * tokens[]) {
@@ -81,6 +66,21 @@ int chopCmd(char * cmd, char * tokens[]) {
     return i;
 }
 
+bool processCommand(char *arguments[MAX], int nArguments) {
+    // if (arguments[0] != NULL) printf("%s\n", arguments[0]);
+    // if (arguments[1] != NULL) printf("%s\n", arguments[1]);
+    // if (arguments[2] == NULL) printf("el dos apunta a null\n");
+    // printf("%d arguments\n", nArguments);
+
+    if (strcmp(arguments[0], "authors") == 0) cmdAuthors(arguments, nArguments);
+    else if (strcmp(arguments[0], "pid") == 0) cmdPid(arguments, nArguments);
+    else if (strcmp(arguments[0], "quit") == 0) return false;
+    else if (strcmp(arguments[0], "bye") == 0) return false;
+    else if (strcmp(arguments[0], "exit") == 0) return false;
+    else printf("macaco escribe ben\n");
+     
+    return true;
+}
 
 void cmdAuthors (char *arguments[MAX], int nArguments) {
     char authorsNames[] = "Iago Dani";
@@ -88,31 +88,33 @@ void cmdAuthors (char *arguments[MAX], int nArguments) {
 
     switch (nArguments) {
         case 1:
-            printf("%s\n%s", authorsNames, authorsLogins);
+            printf("%s\n%s\n", authorsNames, authorsLogins);
             break;
         case 2:
-                if (strcmp(arguments[1], "-l") == 0) printf ("%s\n", authorsLogins);
-                else if (strcmp(arguments[1], "-n") == 0) printf ("%s\n", authorsNames);
-                else printf("Error: Unexpected argument '%s' found\n", arguments[1]);
+            if (strcmp(arguments[1], "-l") == 0) printf ("%s\n", authorsLogins);
+            else if (strcmp(arguments[1], "-n") == 0) printf ("%s\n", authorsNames);
+            else printf("Error: Unexpected argument '%s' found\n", arguments[1]);
+            break;
         default:
             printf("Error: Multiple arguements\n");
             break;
-        }
+    }
 }
 
 void cmdPid (char *arguments[MAX], int nArguments) {
-    char *pid = getenv("$$");
-    char *ppid = getenv("PPID");
+    pid_t pid = getpid(); 
+    pid_t ppid = getppid();
 
     switch (nArguments) {
         case 1:
-            printf("Actual process identifier: %s", pid);
+            printf("Current process identifier: %d\n", pid);
             break;
         case 2:
-                if (strcmp(arguments[1], "-l") == 0) printf("Actual process identifier: %s", ppid);
-                else printf("Error: Unexpected argument '%s' found", arguments[1]);
+            if (strcmp(arguments[1], "-p") == 0) printf("Current process parent identifier: %d\n", ppid);
+            else printf("Error: Unexpected argument '%s' found\n", arguments[1]);
+            break;
         default:
-            printf("Error: Multiple arguements");
+            printf("Error: Multiple arguements\n");
             break;
         }
 }
