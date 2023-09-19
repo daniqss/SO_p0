@@ -1,0 +1,162 @@
+==19979== Memcheck, a memory error detector
+==19979== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==19979== Using Valgrind-3.21.0-d97fed7c3e-20230428 and LibVEX; rerun with -h for copyright info
+==19979== Command: ./main
+==19979== Parent PID: 18966
+==19979== 
+--19979-- 
+--19979-- Valgrind options:
+--19979--    --leak-check=full
+--19979--    --show-leak-kinds=all
+--19979--    --track-origins=yes
+--19979--    --verbose
+--19979--    --log-file=valgrind-report.txt
+--19979-- Contents of /proc/version:
+--19979--   Linux version 6.5.2-arch1-1 (linux@archlinux) (gcc (GCC) 13.2.1 20230801, GNU ld (GNU Binutils) 2.41.0) #1 SMP PREEMPT_DYNAMIC Wed, 06 Sep 2023 21:01:01 +0000
+--19979-- 
+--19979-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--19979-- Page sizes: currently 4096, max supported 4096
+--19979-- Valgrind library directory: /usr/lib/valgrind
+--19979-- Reading syms from /home/ranicocs/FIC/SOProjects/p0/main
+==19979== Downloading debug info for /home/ranicocs/FIC/SOProjects/p0/main...
+==19979== Server query failed: No such file or directory
+--19979-- Reading syms from /usr/lib/ld-linux-x86-64.so.2
+==19979== Downloading debug info for /usr/lib/ld-linux-x86-64.so.2...
+--19979--   Considering /home/ranicocs/.cache/debuginfod_client/5bda152cf75d0de2f24431a9ab38ef1a99cbedf9/debuginfo ..
+--19979--   .. CRC is valid
+==19979== Successfully downloaded debug file for /usr/lib/ld-linux-x86-64.so.2
+--19979-- Reading syms from /usr/lib/valgrind/memcheck-amd64-linux
+==19979== Downloading debug info for /usr/lib/valgrind/memcheck-amd64-linux...
+--19979--   Considering /home/ranicocs/.cache/debuginfod_client/4efee52aade45b84c3c34acbcf7e3a30dbc49e62/debuginfo ..
+--19979--   .. CRC is valid
+==19979== Successfully downloaded debug file for /usr/lib/valgrind/memcheck-amd64-linux
+--19979--    object doesn't have a dynamic symbol table
+--19979-- Scheduler: using generic scheduler lock implementation.
+--19979-- Reading suppressions file: /usr/lib/valgrind/default.supp
+==19979== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-19979-by-ranicocs-on-???
+==19979== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-19979-by-ranicocs-on-???
+==19979== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-19979-by-ranicocs-on-???
+==19979== 
+==19979== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==19979== don't want to do, unless you know exactly what you're doing,
+==19979== or are doing some strange experiment):
+==19979==   /usr/lib/valgrind/../../bin/vgdb --pid=19979 ...command...
+==19979== 
+==19979== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==19979==   /path/to/gdb ./main
+==19979== and then give GDB the following command
+==19979==   target remote | /usr/lib/valgrind/../../bin/vgdb --pid=19979
+==19979== --pid is optional if only one valgrind process is running
+==19979== 
+--19979-- REDIR: 0x40244e0 (ld-linux-x86-64.so.2:strlen) redirected to 0x580c1122 (vgPlain_amd64_linux_REDIR_FOR_strlen)
+--19979-- REDIR: 0x4022c90 (ld-linux-x86-64.so.2:index) redirected to 0x580c113c (vgPlain_amd64_linux_REDIR_FOR_index)
+--19979-- Reading syms from /usr/lib/valgrind/vgpreload_core-amd64-linux.so
+==19979== Downloading debug info for /usr/lib/valgrind/vgpreload_core-amd64-linux.so...
+--19979--   Considering /home/ranicocs/.cache/debuginfod_client/060a58c2256ae9a895586d0231020becccaadf3a/debuginfo ..
+--19979--   .. CRC is valid
+==19979== Successfully downloaded debug file for /usr/lib/valgrind/vgpreload_core-amd64-linux.so
+--19979-- Reading syms from /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so
+==19979== Downloading debug info for /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so...
+--19979--   Considering /home/ranicocs/.cache/debuginfod_client/23b76fcedd76ac77e136ed69676378bd047b5ff2/debuginfo ..
+--19979--   .. CRC is valid
+==19979== Successfully downloaded debug file for /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so
+==19979== WARNING: new redirection conflicts with existing -- ignoring it
+--19979--     old: 0x040244e0 (strlen              ) R-> (0000.0) 0x580c1122 vgPlain_amd64_linux_REDIR_FOR_strlen
+--19979--     new: 0x040244e0 (strlen              ) R-> (2007.0) 0x04847fe0 strlen
+--19979-- REDIR: 0x4022ec0 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4849100 (strcmp)
+--19979-- REDIR: 0x40222f0 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x484cef0 (mempcpy)
+--19979-- Reading syms from /usr/lib/libc.so.6
+==19979== Downloading debug info for /usr/lib/libc.so.6...
+--19979--   Considering /home/ranicocs/.cache/debuginfod_client/316d0d3666387f0e8fb98773f51aa1801027c5ab/debuginfo ..
+--19979--   .. CRC is valid
+==19979== Successfully downloaded debug file for /usr/lib/libc.so.6
+--19979-- REDIR: 0x4024680 (ld-linux-x86-64.so.2:strncmp) redirected to 0x4848930 (strncmp)
+--19979-- REDIR: 0x491ce20 (libc.so.6:strncasecmp) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491a1d0 (libc.so.6:mempcpy) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491a530 (libc.so.6:stpcpy) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x4998a60 (libc.so.6:__memmove_chk) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x493d780 (libc.so.6:wmemcmp) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491b080 (libc.so.6:strcat) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x4919960 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x4998940 (libc.so.6:__memcpy_chk) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+==19979== WARNING: new redirection conflicts with existing -- ignoring it
+--19979--     old: 0x049d6550 (__memcpy_chk_avx_una) R-> (2024.0) 0x0484c960 __memmove_chk
+--19979--     new: 0x049d6550 (__memcpy_chk_avx_una) R-> (2030.0) 0x0484cff0 __memcpy_chk
+--19979-- REDIR: 0x4931a40 (libc.so.6:wcslen) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491a380 (libc.so.6:memset) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x49322c0 (libc.so.6:wcsnlen) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491d110 (libc.so.6:strnlen) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491d1a0 (libc.so.6:strpbrk) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491b200 (libc.so.6:strcmp) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491a2f0 (libc.so.6:memrchr) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x4930800 (libc.so.6:wcschr) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491b0f0 (libc.so.6:index) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491d1d0 (libc.so.6:rindex) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x49308b0 (libc.so.6:wcscmp) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491a5a0 (libc.so.6:stpncpy) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x493d700 (libc.so.6:wmemchr) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491cfc0 (libc.so.6:strncmp) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491a600 (libc.so.6:strcasecmp) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491c3a0 (libc.so.6:strcspn) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x4931830 (libc.so.6:wcscpy) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491cec0 (libc.so.6:strncasecmp_l) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491b170 (libc.so.6:strchrnul) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x4919870 (libc.so.6:bcmp) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491c330 (libc.so.6:strcpy) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491a6a0 (libc.so.6:strcasecmp_l) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491cd90 (libc.so.6:strlen) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491d060 (libc.so.6:strncpy) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491a0b0 (libc.so.6:memmove) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+==19979== Preferring higher priority redirection:
+--19979--     old: 0x049d6580 (__memcpy_avx_unalign) R-> (2018.0) 0x0484a4e0 __memcpy_avx_unaligned_erms
+--19979--     new: 0x049d6580 (__memcpy_avx_unalign) R-> (2018.1) 0x0484bf80 memmove
+--19979-- REDIR: 0x49197f0 (libc.so.6:memchr) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x491d390 (libc.so.6:strspn) redirected to 0x48361c0 (_vgnU_ifunc_wrapper)
+--19979-- REDIR: 0x49db170 (libc.so.6:__strrchr_avx2) redirected to 0x48479c0 (rindex)
+--19979-- REDIR: 0x49d92c0 (libc.so.6:__strlen_avx2) redirected to 0x4847ec0 (strlen)
+--19979-- REDIR: 0x49da3a0 (libc.so.6:__strncmp_avx2) redirected to 0x4848750 (strncmp)
+--19979-- REDIR: 0x49d8920 (libc.so.6:__strchrnul_avx2) redirected to 0x484c9d0 (strchrnul)
+--19979-- REDIR: 0x49d6580 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x484bf80 (memmove)
+==19979== Invalid read of size 1
+==19979==    at 0x4847EC6: strlen (vg_replace_strmem.c:501)
+==19979==    by 0x48D96E8: __printf_buffer (vfprintf-process-arg.c:435)
+==19979==    by 0x48D9E51: __vfprintf_internal (vfprintf-internal.c:1523)
+==19979==    by 0x48CF2FE: printf (printf.c:33)
+==19979==    by 0x1092B0: printPrompt (in /home/ranicocs/FIC/SOProjects/p0/main)
+==19979==    by 0x109211: main (in /home/ranicocs/FIC/SOProjects/p0/main)
+==19979==  Address 0x4 is not stack'd, malloc'd or (recently) free'd
+==19979== 
+==19979== 
+==19979== Process terminating with default action of signal 11 (SIGSEGV): dumping core
+==19979==  Access not within mapped region at address 0x4
+==19979==    at 0x4847EC6: strlen (vg_replace_strmem.c:501)
+==19979==    by 0x48D96E8: __printf_buffer (vfprintf-process-arg.c:435)
+==19979==    by 0x48D9E51: __vfprintf_internal (vfprintf-internal.c:1523)
+==19979==    by 0x48CF2FE: printf (printf.c:33)
+==19979==    by 0x1092B0: printPrompt (in /home/ranicocs/FIC/SOProjects/p0/main)
+==19979==    by 0x109211: main (in /home/ranicocs/FIC/SOProjects/p0/main)
+==19979==  If you believe this happened as a result of a stack
+==19979==  overflow in your program's main thread (unlikely but
+==19979==  possible), you can try to increase the size of the
+==19979==  main thread stack using the --main-stacksize= flag.
+==19979==  The main thread stack size used in this run was 8388608.
+==19979== 
+==19979== HEAP SUMMARY:
+==19979==     in use at exit: 0 bytes in 0 blocks
+==19979==   total heap usage: 0 allocs, 0 frees, 0 bytes allocated
+==19979== 
+==19979== All heap blocks were freed -- no leaks are possible
+==19979== 
+==19979== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+==19979== 
+==19979== 1 errors in context 1 of 1:
+==19979== Invalid read of size 1
+==19979==    at 0x4847EC6: strlen (vg_replace_strmem.c:501)
+==19979==    by 0x48D96E8: __printf_buffer (vfprintf-process-arg.c:435)
+==19979==    by 0x48D9E51: __vfprintf_internal (vfprintf-internal.c:1523)
+==19979==    by 0x48CF2FE: printf (printf.c:33)
+==19979==    by 0x1092B0: printPrompt (in /home/ranicocs/FIC/SOProjects/p0/main)
+==19979==    by 0x109211: main (in /home/ranicocs/FIC/SOProjects/p0/main)
+==19979==  Address 0x4 is not stack'd, malloc'd or (recently) free'd
+==19979== 
+==19979== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)

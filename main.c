@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <sys/utsname.h>
 
 #define MAX 5
 #define BUFFER_SIZE 1024
@@ -13,9 +14,10 @@ void printPrompt ();
 void readInputs(char *cmd, char *arguments[], int *nArguments);
 bool processCommand(char *arguments[MAX], int nArguments);
 
-void cmd_authors ();
+void cmd_authors (char *arguments[MAX], int nArguments);
 void cmd_pid (char *arguments[MAX], int nArguments);
 void cmd_chdir (char *arguments[MAX], int nArguments);
+void cmd_infosys (char *arguments[MAX], int nArguments);
 
 
 int main() {
@@ -76,6 +78,7 @@ bool processCommand(char *arguments[MAX], int nArguments) {
     if (strcmp(arguments[0], "authors") == 0) cmd_authors(arguments, nArguments);
     else if (strcmp(arguments[0], "pid") == 0) cmd_pid(arguments, nArguments);
     else if (strcmp(arguments[0], "chdir") == 0) cmd_chdir(arguments, nArguments);
+    else if (strcmp(arguments[0], "infosys") == 0) cmd_infosys(arguments, nArguments);
 
     else if (strcmp(arguments[0], "quit") == 0) return false;
     else if (strcmp(arguments[0], "bye") == 0) return false;
@@ -135,14 +138,8 @@ void cmd_chdir (char *arguments[MAX], int nArguments) {
                 exit(EXIT_FAILURE);
 
             } else {
-                // cwd = realloc(cwd, strlen(cwd) + 1);
-                // if (cwd == NULL) {
-                //     perror("Memory allocation error");
-                //     exit(EXIT_FAILURE);
-                // }
                 printf("Current working directory: %s\n", cwd);
             }
-
             free(cwd);
             break;
 
@@ -157,4 +154,17 @@ void cmd_chdir (char *arguments[MAX], int nArguments) {
     
 }
 
+void cmd_infosys (char *arguments[MAX], int nArguments) {
+   struct utsname machineInfo;
 
+   if (uname(&machineInfo) == -1) {
+    perror("ename error");
+    exit(EXIT_FAILURE);
+   }
+    printf("Operative system = %s\n", machineInfo.sysname);
+    printf("Machine name   = %s\n", machineInfo.nodename);
+    printf("Kernel version     = %s\n", machineInfo.release);
+    printf("???     = %s\n", machineInfo.version);
+    printf("Arquitectura     = %s\n", machineInfo.machine);
+
+}
