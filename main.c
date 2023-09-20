@@ -237,3 +237,4 @@ void cmd_open(char *arguments[], int nArguments)
         //...........AnadirAFicherosAbiertos (descriptor...modo...nombre....)....
         printf("Anadida entrada a la tabla ficheros abiertos..................");
     }
+}
