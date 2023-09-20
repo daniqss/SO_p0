@@ -24,22 +24,17 @@ struct tNodeC{
 typedef tPosC tListC;
 
 
-void CreateList(tListC* L);
+void CreateList(tListC* L); //Función que crea una lista vacía.
 
-tPosC next(tPosC pos,tListC L);
+tPosC next(tPosC pos,tListC L); //Función que accede a la siguiente posición a una dada en una lista.
 
-tPosC last(tListC L);
+tPosC last(tListC L); //Función que accede a la última posición de una lista.
 
-void InsertElement(tItemC item, tListC* L);
+void InsertElement(tItemC item, tListC* L); //Función que inserta un elemento dado al final de una lista.
 
-void RemoveElement(tItemC item, tListC* L);
+void RemoveElement(tPosC p, tListC* L); //Función que remueve un elemento en la posición dada de una lista.
 
-void DisplayList(tListC* L);
-
-
-
-
-
+void DisplayList(tListC* L); //Función que muestra todos los elementos de una lista.
 
 
 
