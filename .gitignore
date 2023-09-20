@@ -1,0 +1,14 @@
+# Node.js
+/node_modules
+
+# npm
+package-lock.json
+package.json
+npm-debug.log
+.prettierrc
+
+# CLion
+.idea/
+
+# VSCode
+.vscode/
