@@ -1,19 +1,20 @@
-//
-// Created by ranicocs on 14/09/23.
-//
-
 #include "command_list.h"
 
-void CreateList(tListC *L)
+bool isEmptyC(tListC L)
+{
+    return L == CNULL;
+}
+
+void createListC(tListC *L)
 {
     L = CNULL;
 }
-tPosC next(tPosC pos, tListC L)
+tPosC nextC(tPosC pos, tListC L)
 {
     return pos->next;
 } // Devolvemos la posición siguiente
 
-tPosC last(tListC L)
+tPosC lastC(tListC L)
 {
     tPosC p;
     for (p = L; next(p, L) != CNULL; p = next(p, L))
@@ -27,7 +28,7 @@ bool createNodeC(tPosC *p)
     return *p != CNULL;
 } // Función auxiliar en la que intentamos reservar memoria para una posición y devolvemos si lo hemos logrado o no.
 
-bool InsertElement(tItemC item, tListC *L)
+bool insertElementC(tItemC item, tListC *L)
 {
     tPosC p, q;
     if (!createNodeC(&q))
@@ -43,7 +44,7 @@ bool InsertElement(tItemC item, tListC *L)
         q->next = CNULL;
 
         //If list is empty, insert element as first element
-        if (*L == CNULL) *L = q;
+        if (isEmptyC(*L)) *L = q;
         //Else, insert element at the end of the list
         p = lastF(*L);
         p->next = q;
@@ -52,7 +53,7 @@ bool InsertElement(tItemC item, tListC *L)
     } // Creamos el elemento, lo insertamos al final y devolvemos un "true", ya que hemos podido insertar el elemento.
 }
 
-void RemoveElement(tPosC p, tListC *L)
+void removeElementC(tPosC p, tListC *L)
 {
     tPosC q;
     if (p == *L) // Si queremos eliminar la primera posición hacemos que la lista empiece en la siguiente
@@ -73,7 +74,7 @@ void RemoveElement(tPosC p, tListC *L)
     free(p); // Liberamos los datos de la posición.
 }
 
-void DisplayList(tListC L)
+void displayListC(tListC L)
 {
     tPosC p;
     for (p = L; p != CNULL; p = next(p, L))

@@ -29,6 +29,8 @@ struct tNodeF
 
 typedef tPosF tListF;
 
+bool isEmptyF(tListF L); // Función que devuelve si una lista está vacía o no.
+
 void createListF(tListF *L); // Función que crea una lista vacía.
 
 tPosF nextF(tPosF pos, tListF L); // Función que accede a la siguiente posición a una dada en una lista.

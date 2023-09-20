@@ -23,17 +23,18 @@ struct tNodeC
 
 typedef tPosC tListC;
 
+bool isEmptyC(tListC L); // Función que devuelve si una lista está vacía o no.
 
-void CreateList(tListC *L); // Función que crea una lista vacía.
+void CreateListC(tListC *L); // Función que crea una lista vacía.
 
-tPosC next(tPosC pos, tListC L); // Función que accede a la siguiente posición a una dada en una lista.
+tPosC nextC(tPosC pos, tListC L); // Función que accede a la siguiente posición a una dada en una lista.
 
-tPosC last(tListC L); // Función que accede a la última posición de una lista.
+tPosC lastC(tListC L); // Función que accede a la última posición de una lista.
 
-bool InsertElement(tItemC item, tListC *L); // Función que inserta un elemento dado al final de una lista.
+bool InsertElementC(tItemC item, tListC *L); // Función que inserta un elemento dado al final de una lista.
 
-void RemoveElement(tPosC p, tListC *L); // Función que remueve un elemento en la posición dada de una lista.
+void RemoveElementC(tPosC p, tListC *L); // Función que remueve un elemento en la posición dada de una lista.
 
-void DisplayList(tListC L); // Función que muestra todos los elementos de una lista.
+void DisplayListC(tListC L); // Función que muestra todos los elementos de una lista.
 
 #endif

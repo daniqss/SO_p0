@@ -1,5 +1,10 @@
 #include "file_list.h"
 
+bool isEmptyF(tListF L)
+{
+    return L == FNULL;
+}
+
 void createListF(tListF *L)
 {
     L = FNULL;
@@ -49,7 +54,7 @@ bool insertElementF(tItemF item, tListF *L)
     q->next = FNULL;
 
     // If list is empty, insert element as first element
-    if (*L == FNULL)
+    if (isEmptyF(*L))
         *L = q;
     // Else, insert element at the end of the list
     p = lastF(*L);
@@ -87,7 +92,8 @@ tPosF findElementF(tItemF item, tListF L)
 {
     tPosF p;
 
-    for (p = L; (p != FNULL) && (strcmp(p->data.fileName, item.fileName)); p = p->next);
+    for (p = L; (p != FNULL) && (strcmp(p->data.fileName, item.fileName)); p = p->next)
+        ;
 
     return p;
 }
