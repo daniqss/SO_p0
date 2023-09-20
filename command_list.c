@@ -41,8 +41,13 @@ bool InsertElement(tItemC item, tListC *L)
     {
         q->data = item;
         q->next = CNULL;
-        p = last(*L);
+
+        //If list is empty, insert element as first element
+        if (*L == CNULL) *L = q;
+        //Else, insert element at the end of the list
+        p = lastF(*L);
         p->next = q;
+
         return true;
     } // Creamos el elemento, lo insertamos al final y devolvemos un "true", ya que hemos podido insertar el elemento.
 }
