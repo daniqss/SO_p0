@@ -72,11 +72,24 @@ void removeElementF(tPosF p, tListF *L)
     else
     {
         q = nextF(p, *L);
-        p->data = q->data;
+        strcpy(p->data.fileName, q->data.fileName);
+        p->data.descriptor = q->data.descriptor;
+        p->data.mode = q->data.mode;
+
         p->next = q->next;
         p = q;
-    }        // Si queremos eliminar una posición intermedia duplicamos el siguiente nodo en esa posición y hacemos que "p" apunte al siguiente.
-    free(p); // Liberamos los datos de la posición.
+    }
+    free(p->data.fileName);
+    free(p);
+}
+
+tPosF findElementF(tItemF item, tListF L)
+{
+    tPosF p;
+
+    for (p = L; (p != FNULL) && (strcmp(p->data.fileName, item.fileName)); p = p->next);
+
+    return p;
 }
 
 void DisplayList(tListF L)
@@ -84,6 +97,8 @@ void DisplayList(tListF L)
     tPosF p;
     for (p = L; p != FNULL; p = nextF(p, L))
     {
-        printf(" %s \n", p->data);
+        printf(" %s \n", p->data.fileName);
+        printf(" %d \n", p->data.descriptor);
+        printf(" %d \n", p->data.mode);
     } // Recorremos la lista y mostramos cada elemento
 }

@@ -6,6 +6,8 @@
 #include <sys/types.h>
 #include <sys/utsname.h>
 #include <fcntl.h>
+#include "file_list.h"
+#include "command_list.h"
 
 #define MAX 5
 #define BUFFER_SIZE 1024
@@ -35,6 +37,7 @@ int main()
         quit = processCommand(arguments, nArguments);
 
     } while (quit);
+
     for (int i = 0; i < nArguments; i++)
     {
         free(arguments[i]);
