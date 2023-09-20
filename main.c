@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/utsname.h>
+#include <fcntl.h>
 
 #define MAX 5
 #define BUFFER_SIZE 1024
@@ -167,4 +168,29 @@ void cmd_infosys (char *arguments[MAX], int nArguments) {
     printf("???     = %s\n", machineInfo.version);
     printf("Arquitectura     = %s\n", machineInfo.machine);
 
+}
+
+void cmd_open (char * arguments[], int nArguments) {
+    int i,df, mode=0;
+    
+    if (arguments[0]==NULL) { 
+       
+        return;
+    }
+
+    for (i=1; arguments[i]!=NULL; i++) {
+      if (!strcmp(arguments[i],"cr")) mode|=O_CREAT;
+      else if (!strcmp(arguments[i],"ex")) mode|=O_EXCL;
+      else if (!strcmp(arguments[i],"ro")) mode|=O_RDONLY; 
+      else if (!strcmp(arguments[i],"wo")) mode|=O_WRONLY;
+      else if (!strcmp(arguments[i],"rw")) mode|=O_RDWR;
+      else if (!strcmp(arguments[i],"ap")) mode|=O_APPEND;
+      else if (!strcmp(arguments[i],"tr")) mode|=O_TRUNC; 
+      else break;
+    }
+    if ((df=open(arguments[0],mode,0777))==-1)
+        perror ("Imposible abrir fichero");
+    else{
+        //...........AnadirAFicherosAbiertos (descriptor...modo...nombre....)....
+        printf ("Anadida entrada a la tabla ficheros abiertos..................");
 }

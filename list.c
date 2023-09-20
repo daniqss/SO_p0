@@ -4,26 +4,26 @@
 
 #include "list.h"
 
-void CreateList(tListC* L){
+void CreateList(tListC* L) {
     L = CNULL;
 }
-tPosC next(tPosC pos,tListC L){
+tPos next(tPos pos,tListC L) {
     return pos->next;
 } //Devolvemos la posición siguiente
 
-tPosC last(tListC L){
-    tPosC p;
-    for(p=L; next(pos,L)!=CNULL; p = next(p,L));
+tPos last(tListC L) {
+    tPos p;
+    for(p=L; next(p,L)!=CNULL; p = next(p,L));
     return p;
 }//Buscamos la última posición y la devolvemos
 
-bool createNodeC(tPosC *p){
-    *p= malloc(sizeof(struct tNodeC));
+bool createNodeC(tPos *p) {
+    *p= malloc(sizeof(struct tNode));
     return *p!=CNULL;
 } //Función auxiliar en la que intentamos reservar memoria para una posición y devolvemos si lo hemos logrado o no.
 
-bool InsertElement(tItemC item, tListC* L){
-    tPosC p,q;
+bool InsertElement(tItem item, tListC* L) {
+    tPos p,q;
     if(!createNodeC(&q))
         return false;
     //Devuelve false si no hemos podido crear el nodo
@@ -36,7 +36,7 @@ bool InsertElement(tItemC item, tListC* L){
     }//Creamos el elemento, lo insertamos al final y devolvemos un "true", ya que hemos podido insertar el elemento.
 }
 
-void RemoveElement(tPosC p, tListC *L){
+void RemoveElement(tPos p, tListC *L) {
     tPos q;
     if(p == *L) //Si queremos eliminar la primera posición hacemos que la lista empiece en la siguiente
         *L= next(*L,*L);
@@ -53,9 +53,9 @@ void RemoveElement(tPosC p, tListC *L){
     free(p); //Liberamos los datos de la posición.
 }
 
-void DisplayList(tListC L){
-    tPosC p;
+void DisplayList(tListC L) {
+    tPos p;
     for ( p = L; p != CNULL ; p = next(p,L)) {
-        printf(" %s \n",p.data);
+        printf(" %s \n",p->data);
     } //Recorremos la lista y mostramos cada elemento
 }
