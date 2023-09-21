@@ -14,8 +14,7 @@
 #define MAX_FILES 4096
 #define FNULL NULL
 
-typedef struct
-{
+typedef struct{
     char *fileName; // Puntero al nombre del archivo
     int descriptor; // Descriptor de archivo (file descriptor)
     int mode;       // Modo de apertura del archivo
