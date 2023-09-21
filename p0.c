@@ -9,6 +9,7 @@
 #include <time.h>
 #include "file_list.h"
 #include "command_list.h"
+#include<time.h>
 
 #define MAX 1024
 #define BUFFER_SIZE 1024
@@ -290,3 +291,20 @@ void cmd_close (char *arguments[MAX], tListF *fileList) {
         removeElementF(findElementF(fileDescriptor, *fileList), fileList);
     }
 }
+
+void cmd_close (char *arguments[MAX], tListF *fileList)
+{
+    int fileDescriptor;
+
+    if (arguments[1]==NULL || (fileDescriptor=atoi(arguments[1]))<0) {
+        displayListF(*fileList);
+    }
+
+
+    if (close(fileDescriptor)==-1)
+        perror("Imposible cerrar descriptor");
+    else {
+        removeElementF(findElementF(fileDescriptor, *fileList), fileList);
+    }
+}
+
