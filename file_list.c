@@ -1,49 +1,40 @@
 #include "file_list.h"
 
-bool isEmptyF(tListF L)
-{
+bool isEmptyF(tListF L) {
     return L == FNULL;
 }
 
-void createListF(tListF *L)
-{
+void createListF(tListF *L) {
     L = FNULL;
 }
 
-tPosF nextF(tPosF pos, tListF L)
-{
+tPosF nextF(tPosF pos, tListF L) {
     return pos->next;
 } // Devolvemos la posición siguiente
 
-tPosF lastF(tListF L)
-{
+tPosF lastF(tListF L) {
     tPosF p;
-    for (p = L; nextF(p, L) != FNULL; p = nextF(p, L))
-        ;
+    for (p = L; nextF(p, L) != FNULL; p = nextF(p, L));
     return p;
 } // Buscamos la última posición y la devolvemos
 
-bool createNodeF(tPosF *p)
-{
+bool createNodeF(tPosF *p) {
     *p = malloc(sizeof(struct tNodeF));
     return *p != FNULL;
 } // Función auxiliar en la que intentamos reservar memoria para una posición y devolvemos si lo hemos logrado o no.
 
-bool insertElementF(tItemF item, tListF *L)
-{
+bool insertElementF(tItemF item, tListF *L){
     tPosF p, q;
 
-    if (!createNodeC(&q))
-    {
+    if (!createNodeF(&q)) {
         free(q);
         printf("Node creation failed\n");
         return false;
     }
     // Devuelve false si no hemos podido crear el nodo
 
-    q->data.fileName = (char *)malloc(strlen(item.fileName) + 1); // Asigna memoria dinámica para fileName
-    if (q->data.fileName == NULL)
-    {
+    q->data.fileName = (char *) malloc(strlen(item.fileName) + 1); // Asigna memoria dinámica para fileName
+    if (q->data.fileName == NULL) {
         printf("Memory allocation for fileName failed\n");
         free(q);
         return false;
@@ -63,19 +54,15 @@ bool insertElementF(tItemF item, tListF *L)
     return true;
 }
 
-void removeElementF(tPosF p, tListF *L)
-{
+void removeElementF(tPosF p, tListF *L) {
     tPosF q;
     if (p == *L) // Si queremos eliminar la primera posición hacemos que la lista empiece en la siguiente
         *L = nextF(*L, *L);
-    else if (p == lastF(*L))
-    {
-        for (q = *L; (q->next != FNULL) && (q->next != p); q = nextF(q, *L))
-            ;
+    else if (p == lastF(*L)) {
+        for (q = *L; (q->next != FNULL) && (q->next != p); q = nextF(q, *L));
         q->next = FNULL;
     } // Si queremos eliminar la última posición hacemos que la lista acabe en el penúltimo elemento
-    else
-    {
+    else {
         q = nextF(p, *L);
         strcpy(p->data.fileName, q->data.fileName);
         p->data.descriptor = q->data.descriptor;
@@ -88,23 +75,17 @@ void removeElementF(tPosF p, tListF *L)
     free(p);
 }
 
-tPosF findElementF(tItemF item, tListF L)
-{
+tPosF findElementF(int fileDescriptor, tListF L) {
     tPosF p;
 
-    for (p = L; (p != FNULL) && (strcmp(p->data.fileName, item.fileName)); p = p->next)
-        ;
+    for (p = L; (p != FNULL) && (p->data.descriptor != fileDescriptor); p = p->next);
 
     return p;
 }
 
-void DisplayList(tListF L)
-{
+void DisplayListF(tListF L) {
     tPosF p;
-    for (p = L; p != FNULL; p = nextF(p, L))
-    {
-        printf(" %s \n", p->data.fileName);
-        printf(" %d \n", p->data.descriptor);
-        printf(" %d \n", p->data.mode);
+    for (p = L; p != FNULL; p = nextF(p, L)) {
+        printf("descriptor: %d -> %s %d ",p->data.descriptor,p->data.fileName,p->data.mode);
     } // Recorremos la lista y mostramos cada elemento
 }

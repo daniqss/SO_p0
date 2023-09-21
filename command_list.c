@@ -1,72 +1,60 @@
 #include "command_list.h"
 
-bool isEmptyC(tListC L)
-{
+bool isEmptyC(tListC L) {
     return L == CNULL;
 }
 
-void createListC(tListC *L)
-{
+void createListC(tListC *L) {
     L = CNULL;
 }
-tPosC nextC(tPosC pos, tListC L)
-{
+
+tPosC nextC(tPosC pos, tListC L) {
     return pos->next;
 } // Devolvemos la posición siguiente
 
-tPosC lastC(tListC L)
-{
+tPosC lastC(tListC L) {
     tPosC p;
-    for (p = L; next(p, L) != CNULL; p = next(p, L))
-        ;
+    for (p = L; nextC(p, L) != CNULL; p = nextC(p, L));
     return p;
 } // Buscamos la última posición y la devolvemos
 
-bool createNodeC(tPosC *p)
-{
+bool createNodeC(tPosC *p) {
     *p = malloc(sizeof(struct tNodeC));
     return *p != CNULL;
 } // Función auxiliar en la que intentamos reservar memoria para una posición y devolvemos si lo hemos logrado o no.
 
-bool insertElementC(tItemC item, tListC *L)
-{
+bool insertElementC(tItemC item, tListC *L) {
     tPosC p, q;
-    if (!createNodeC(&q))
-    {
+    if (!createNodeC(&q)) {
         printf("Node creation failed\n");
         return false;
     }
 
-    // Devuelve false si no hemos podido crear el nodo
-    else
-    {
+        // Devuelve false si no hemos podido crear el nodo
+    else {
         q->data = item;
         q->next = CNULL;
 
         //If list is empty, insert element as first element
         if (isEmptyC(*L)) *L = q;
         //Else, insert element at the end of the list
-        p = lastF(*L);
+        p = lastC(*L);
         p->next = q;
 
         return true;
     } // Creamos el elemento, lo insertamos al final y devolvemos un "true", ya que hemos podido insertar el elemento.
 }
 
-void removeElementC(tPosC p, tListC *L)
-{
+void removeElementC(tPosC p, tListC *L) {
     tPosC q;
     if (p == *L) // Si queremos eliminar la primera posición hacemos que la lista empiece en la siguiente
-        *L = next(*L, *L);
-    else if (p == last(*L))
-    {
-        for (q = *L; (q->next != CNULL) && (q->next != p); q = next(q, *L))
-            ;
+        *L = nextC(*L, *L);
+    else if (p == lastC(*L)) {
+        for (q = *L; (q->next != CNULL) && (q->next != p); q = nextC(q, *L));
         q->next = CNULL;
     } // Si queremos eliminar la última posición hacemos que la lista acabe en el penúltimo elemento
-    else
-    {
-        q = next(p, *L);
+    else {
+        q = nextC(p, *L);
         p->data = q->data;
         p->next = q->next;
         p = q;
@@ -74,11 +62,9 @@ void removeElementC(tPosC p, tListC *L)
     free(p); // Liberamos los datos de la posición.
 }
 
-void displayListC(tListC L)
-{
+void displayListC(tListC L) {
     tPosC p;
-    for (p = L; p != CNULL; p = next(p, L))
-    {
+    for (p = L; p != CNULL; p = nextC(p, L)) {
         printf(" %s \n", p->data);
     } // Recorremos la lista y mostramos cada elemento
 }

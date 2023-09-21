@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MAX_FILES 4096
 #define FNULL NULL

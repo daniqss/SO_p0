@@ -1,3 +1,4 @@
+#Compilador
 CC = gcc
 
 # Nombre del ejecutable
@@ -6,6 +7,9 @@ TARGET = p0
 # Fuentes y objetos
 SRCS = p0.c command_list.c file_list.c
 OBJS = $(SRCS:.c=.o)
+
+#Opciones del compilador
+CFLAGS = -Wall
 
 # Regla predeterminada
 all: $(TARGET)
@@ -16,8 +20,6 @@ $(TARGET): $(OBJS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $<
-
-
 %.c:
 # Limpieza de archivos generados
 clean:
