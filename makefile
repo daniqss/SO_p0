@@ -1,21 +1,34 @@
 CC = gcc
-CFLAGS = -Wall -Werror
-EXECUTABLE = main
-SOURCES = main.c
-OBJECTS = $(SOURCES:.c=.o)
 
-#.PHONY: all clean run
+# Nombre del ejecutable
+TARGET = p0
 
-all: $(EXECUTABLE)
+# Fuentes y objetos
+SRCS = p0.c command_list.c file_list.c
+OBJS = $(SRCS:.c=.o)
 
-$(EXECUTABLE): $(OBJECTS)
-    $(CC) $(CFLAGS) -o $@ $^
+# Regla predeterminada
+all: $(TARGET)
+
+#Compilación
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
 
 %.o: %.c
-    $(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c $<
 
-run: $(EXECUTABLE)
-	valgrind --leak-check=full ./$(EXECUTABLE)
 
+%.c:
+# Limpieza de archivos generados
 clean:
-    rm -f $(OBJECTS) $(EXECUTABLE)
+	rm -f $(OBJS) $(TARGET)
+
+# Ejecutar el programa
+run: $(TARGET)
+	./$(TARGET)
+
+# Ejecutar Valgrind
+valgrind: $(TARGET)
+	valgrind --leak-check=full ./$(TARGET)
+
+.PHONY: all clean valgrind run
