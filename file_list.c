@@ -83,7 +83,7 @@ tPosF findElementF(int fileDescriptor, tListF L) {
     return p;
 }
 
-void DisplayListF(tListF L) {
+void displayListF(tListF L) {
     tPosF p;
     for (p = L; p != FNULL; p = nextF(p, L)) {
         printf("descriptor: %d -> %s %d ",p->data.descriptor,p->data.fileName,p->data.mode);

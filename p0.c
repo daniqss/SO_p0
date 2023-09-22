@@ -58,11 +58,7 @@ int main() {
 }
 
 void printPrompt() {
-    char *userName = getenv("USER");
-    if (userName == NULL)
-        exit(EXIT_FAILURE);
-
-    printf("[%s]>> ", userName);
+    printf("-> ");
 }
 
 void readInputs(char *cmd, char *arguments[], int *nArguments) {
