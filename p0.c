@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/utsname.h>
 #include <fcntl.h>
+#include <time.h>
 #include "file_list.h"
 #include "command_list.h"
 
