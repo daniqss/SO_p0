@@ -8,13 +8,13 @@ void createListC(tListC *L) {
     L = CNULL;
 }
 
-tPosC nextC(tPosC pos, tListC L) {
+tPosC nextC(tPosC pos) {
     return pos->next;
 } // Devolvemos la posición siguiente
 
 tPosC lastC(tListC L) {
     tPosC p;
-    for (p = L; nextC(p, L) != CNULL; p = nextC(p, L));
+    for (p = L; nextC(p) != CNULL; p = nextC(p));
     return p;
 } // Buscamos la última posición y la devolvemos
 
@@ -48,13 +48,13 @@ bool insertElementC(tItemC item, tListC *L) {
 void removeElementC(tPosC p, tListC *L) {
     tPosC q;
     if (p == *L) // Si queremos eliminar la primera posición hacemos que la lista empiece en la siguiente
-        *L = nextC(*L, *L);
+        *L = nextC(*L);
     else if (p == lastC(*L)) {
-        for (q = *L; (q->next != CNULL) && (q->next != p); q = nextC(q, *L));
+        for (q = *L; (q->next != CNULL) && (q->next != p); q = nextC(q));
         q->next = CNULL;
     } // Si queremos eliminar la última posición hacemos que la lista acabe en el penúltimo elemento
     else {
-        q = nextC(p, *L);
+        q = nextC(p);
         p->data = q->data;
         p->next = q->next;
         p = q;
@@ -64,24 +64,26 @@ void removeElementC(tPosC p, tListC *L) {
 
 void displayListC(tListC L) {
     tPosC p;
-    for (p = L; p != CNULL; p = nextC(p, L)) {
+    for (p = L; p != CNULL; p = nextC(p)) {
         printf(" %s \n", p->data);
     } // Recorremos la lista y mostramos cada elemento
 }
 
 void freeListC(tListC *L) {
-    tPosC p;
+    tPosC p, q;
     int i = 0;
     printf("Liberando lista de comandos\n");
 
-    while (!isEmptyC(*L)) {
+    p = *L;
+
+    while (!isEmptyC(p)) {
         if (i == 0) printf("entrando al buqle n%d\n", i);
-        p = *L;
         printf("%d\n", i);
 
-        *L = nextC(*L, *L);
+        q = nextC(p);
         i++;
 
         removeElementC(p, L);
+        p = q;
     }
 }

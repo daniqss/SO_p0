@@ -27,7 +27,7 @@ bool isEmptyC(tListC L); // Función que devuelve si una lista está vacía o no
 
 void createListC(tListC *L); // Función que crea una lista vacía.
 
-tPosC nextC(tPosC pos, tListC L); // Función que accede a la siguiente posición a una dada en una lista.
+tPosC nextC(tPosC pos); // Función que accede a la siguiente posición a una dada en una lista.
 
 tPosC lastC(tListC L); // Función que accede a la última posición de una lista.
 

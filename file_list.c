@@ -122,10 +122,12 @@ void displayListF(tListF L) {
 
 void freeListF(tListF *L) {
     tPosF p;
-    while (!isEmptyF(*L)) {
-        p = *L;
-        *L = nextF(*L, *L);
-        removeElementF(p, L);
+
+    if(!isEmptyF(*L)) { 
+        for(p=(*L); p!=NULL; p=nextF(p,*L)) { // Iteramos por todos los jurados de la lista.
+            printf("liberando %s\n", p->data.fileName);
+            removeElementF(p, L);
+        }
     }
 }
 

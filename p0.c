@@ -10,7 +10,7 @@
 #include "file_list.h"
 #include "command_list.h"
 
-#define MAX 5
+#define MAX 1024
 #define BUFFER_SIZE 1024
 
 void readInputs(char *cmd, char *arguments[], int *nArguments); //Lee las entradas
@@ -128,11 +128,11 @@ void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *command
         free(arguments[i]);
     }
 
-    freeListC(commandList);
-    printf("Liberada lista de comandos...\n");
-    
     freeListF(fileList);
     printf("Liberada lista de ficheros...\n");
+
+    // freeListC(commandList);
+    // printf("Liberada lista de comandos...\n");
 }
 
 /////////////////////////
