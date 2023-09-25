@@ -226,7 +226,6 @@ void cmd_time(){
     printf("%02d:%02d:%02d\n", organizedTime.tm_hour,organizedTime.tm_min, organizedTime.tm_sec);
 }
 
-
 void cmd_infosys(char *arguments[MAX], int nArguments) {
     struct utsname machineInfo;
 
@@ -234,11 +233,7 @@ void cmd_infosys(char *arguments[MAX], int nArguments) {
         perror("ename error");
         exit(EXIT_FAILURE);
     }
-    printf("Operative system = %s\n", machineInfo.sysname);
-    printf("Machine name   = %s\n", machineInfo.nodename);
-    printf("Kernel version     = %s\n", machineInfo.release);
-    printf("???     = %s\n", machineInfo.version);
-    printf("Arquitectura     = %s\n", machineInfo.machine);
+    printf("%s (%s), OS: %s-%s-%s\n",machineInfo.nodename,machineInfo.machine,machineInfo.sysname,machineInfo.release, machineInfo.version);
 }
 
 void cmd_open(char *arguments[MAX], int nArguments, tListF *fileList) {
