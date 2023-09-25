@@ -39,6 +39,8 @@ void cmd_infosys(char *arguments[MAX], int nArguments);
 
 void cmd_open(char *arguments[MAX], int nArguments, tListF *fileList);
 
+void cmd_close (char *arguments[MAX], tListF *fileList);
+
 
 
 int main() {
@@ -108,6 +110,8 @@ bool processCommand(char *arguments[MAX], int nArguments, tListF * fileList) {
         cmd_time();
     else if (strcmp(arguments[0],"open")==0)
         cmd_open(arguments, nArguments, fileList);
+    else if (strcmp(arguments[0],"close")==0)
+        cmd_close(arguments, fileList);
 
     else if ((strcmp(arguments[0], "quit") == 0) || (strcmp(arguments[0], "bye") == 0) ||
              (strcmp(arguments[0], "exit") == 0))
@@ -272,5 +276,18 @@ void cmd_open(char *arguments[MAX], int nArguments, tListF *fileList) {
 
             printf("Añadida entrada %d a la tabla de ficheros abiertos\n", fileDescriptor);
         }
+    }
+}
+
+void cmd_close (char *arguments[MAX], tListF *fileList) {
+    int fileDescriptor;
+
+    if (arguments[1]==NULL || (fileDescriptor=atoi(arguments[1]))<0) {
+        displayListF(*fileList);
+    }
+    if (close(fileDescriptor)==-1)
+        perror("Imposible cerrar descriptor");
+    else {
+        removeElementF(findElementF(fileDescriptor, *fileList), fileList);
     }
 }

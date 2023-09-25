@@ -45,6 +45,8 @@ bool insertElementF(tItemF item, tListF *L); // Función que inserta un elemento
 
 void removeElementF(tPosF p, tListF *L); // Función que remueve un elemento en la posición dada de una lista.
 
+tPosF findElementF(int fileDescriptor, tListF L);
+
 void displayListF(tListF L); // Función que muestra todos los elementos de una lista.
 
 void freeListF(tListF *L); // Función que libera la memoria de una lista.
