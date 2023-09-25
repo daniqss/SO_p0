@@ -44,7 +44,6 @@ void cmd_close (char *arguments[MAX], tListF *fileList);
 
 
 int main() {
-    bool quit;
     char *cmd = NULL;
     char *arguments[MAX];
     int nArguments;
@@ -60,8 +59,7 @@ int main() {
     do {
         printPrompt();
         readInputs(cmd, arguments, &nArguments);
-        quit = processCommand(arguments, nArguments, &fileList);
-    } while (quit);
+    } while (processCommand(arguments, nArguments, &fileList));
 
 
     freeMemory(cmd, arguments, nArguments, &commandList, &fileList);
@@ -75,6 +73,7 @@ void printPrompt() {
 void readInputs(char *cmd, char *arguments[], int *nArguments) {
     ssize_t bytesRead; // ssize_t y size_t son unsigned int
     size_t bufferSize = 0;
+    char *cmdCopy = NULL;   // Se la pasaremos a chopCmd para no perder la original
 
     bytesRead = getline(&cmd, &bufferSize, stdin); // getline devuelve el número de bytes escritos si no hay errores
 
@@ -82,7 +81,12 @@ void readInputs(char *cmd, char *arguments[], int *nArguments) {
         perror("Lectura fallida");
         exit(EXIT_FAILURE);
     }
-    *nArguments = chopCmd(cmd, arguments);
+    cmd[bytesRead - 1] = '\0';
+    cmdCopy = (char *) malloc(sizeof(char) * (bytesRead));
+    strcpy(cmdCopy, cmd);
+
+    *nArguments = chopCmd(cmdCopy, arguments);
+    free(cmdCopy);
 }
 
 int chopCmd(char *cmd, char *tokens[]) {
