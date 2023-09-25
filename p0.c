@@ -21,7 +21,10 @@ void printPrompt(); //Imprime Prompt
 
 bool processCommand(char *arguments[MAX], int nArguments, tListF *fileList);
 
+void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *commandList, tListF *fileList);
+
 //Comandos
+
 void cmd_authors(char *arguments[MAX], int nArguments);
 
 void cmd_pid(char *arguments[MAX], int nArguments);
@@ -36,24 +39,30 @@ void cmd_infosys(char *arguments[MAX], int nArguments);
 
 void cmd_open(char *arguments[MAX], int nArguments, tListF *fileList);
 
+
+
 int main() {
     bool quit;
     char *cmd = NULL;
     char *arguments[MAX];
     int nArguments;
 
+    tListC commandList;
+    createListC(&commandList);
+
     tListF fileList;
     createListF(&fileList);
+    if (!insertStdFiles(&fileList)) 
+        exit(EXIT_FAILURE);
 
     do {
         printPrompt();
         readInputs(cmd, arguments, &nArguments);
         quit = processCommand(arguments, nArguments, &fileList);
     } while (quit);
-    for (int i = 0; i < nArguments; i++) {
-        free(arguments[i]);
-    }
-    free(cmd);
+
+
+    freeMemory(cmd, arguments, nArguments, &commandList, &fileList);
     return EXIT_SUCCESS;
 }
 
@@ -84,10 +93,6 @@ int chopCmd(char *cmd, char *tokens[]) {
 }
 
 bool processCommand(char *arguments[MAX], int nArguments, tListF * fileList) {
-    // if (arguments[0] != NULL) printf("%s\n", arguments[0]);
-    // if (arguments[1] != NULL) printf("%s\n", arguments[1]);
-    // if (arguments[2] == NULL) printf("el dos apunta a null\n");
-    // printf("%d arguments\n", nArguments);
 
     if (strcmp(arguments[0], "authors") == 0)
         cmd_authors(arguments, nArguments);
@@ -101,7 +106,7 @@ bool processCommand(char *arguments[MAX], int nArguments, tListF * fileList) {
         cmd_date();
     else if (strcmp(arguments[0],"time")==0)
         cmd_time();
-    else if (strcmp(arguments[0],"time")==0)
+    else if (strcmp(arguments[0],"open")==0)
         cmd_open(arguments, nArguments, fileList);
 
     else if ((strcmp(arguments[0], "quit") == 0) || (strcmp(arguments[0], "bye") == 0) ||
@@ -111,6 +116,24 @@ bool processCommand(char *arguments[MAX], int nArguments, tListF * fileList) {
         printf("No ejecutado: No such file or directory\n");
     return true;
 }
+
+void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *commandList, tListF *fileList) {
+    printf("Liberando...\n");
+    free(cmd);
+    for (int i = 0; i < nArguments; i++) {
+        free(arguments[i]);
+    }
+
+    freeListC(commandList);
+    printf("Liberada lista de comandos...\n");
+    
+    freeListF(fileList);
+    printf("Liberada lista de ficheros...\n");
+}
+
+/////////////////////////
+// COMANDOS  ////////////
+/////////////////////////
 
 void cmd_authors(char *arguments[MAX], int nArguments) {
     char authorsNames[] = "Santiago Daniel";
@@ -222,34 +245,32 @@ void cmd_open(char *arguments[MAX], int nArguments, tListF *fileList) {
         if (isEmptyF(*fileList))
             printf("No hay archivos abiertos");
         displayListF(*fileList);
-    }
+    } else {
 
-    for (i = 2; arguments[i] != NULL; i++) {
-        if (!strcmp(arguments[i], "cr"))
-            mode |= O_CREAT;
-        else if (!strcmp(arguments[i], "ex"))
-            mode |= O_EXCL;
-        else if (!strcmp(arguments[i], "ro"))
-            mode |= O_RDONLY;
-        else if (!strcmp(arguments[i], "wo"))
-            mode |= O_WRONLY;
-        else if (!strcmp(arguments[i], "rw"))
-            mode |= O_RDWR;
-        else if (!strcmp(arguments[i], "ap"))
-            mode |= O_APPEND;
-        else if (!strcmp(arguments[i], "tr"))
-            mode |= O_TRUNC;
-        else
-            break;
-    }
-    if ((fileDescriptor = open(arguments[1], mode, 0777)) == -1)
-        perror("Imposible abrir fichero: No such file or directory");
-    else {
-        tItemF newItem;
-        newItem.fileName = arguments[1];
-        newItem.descriptor = fileDescriptor;
-        insertElementF(newItem, fileList);
+        for (i = 2; arguments[i] != NULL; i++) {
+            if (!strcmp(arguments[i], "cr"))
+                mode |= O_CREAT;
+            else if (!strcmp(arguments[i], "ex"))
+                mode |= O_EXCL;
+            else if (!strcmp(arguments[i], "ro"))
+                mode |= O_RDONLY;
+            else if (!strcmp(arguments[i], "wo"))
+                mode |= O_WRONLY;
+            else if (!strcmp(arguments[i], "rw"))
+                mode |= O_RDWR;
+            else if (!strcmp(arguments[i], "ap"))
+                mode |= O_APPEND;
+            else if (!strcmp(arguments[i], "tr"))
+                mode |= O_TRUNC;
+            else
+                break;
+        }
+        if ((fileDescriptor = open(arguments[1], mode, 0777)) == -1)
+            perror("Imposible abrir fichero: No such file or directory");
+        else {
+            insertElementF((tItemF) {arguments[1], fileDescriptor, mode}, fileList);
 
-        printf("Anadida entrada a la tabla ficheros abiertos..................");
+            printf("Añadida entrada %d a la tabla de ficheros abiertos\n", fileDescriptor);
+        }
     }
 }

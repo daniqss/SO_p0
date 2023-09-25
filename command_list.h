@@ -25,16 +25,18 @@ typedef tPosC tListC;
 
 bool isEmptyC(tListC L); // Función que devuelve si una lista está vacía o no.
 
-void CreateListC(tListC *L); // Función que crea una lista vacía.
+void createListC(tListC *L); // Función que crea una lista vacía.
 
 tPosC nextC(tPosC pos, tListC L); // Función que accede a la siguiente posición a una dada en una lista.
 
 tPosC lastC(tListC L); // Función que accede a la última posición de una lista.
 
-bool InsertElementC(tItemC item, tListC *L); // Función que inserta un elemento dado al final de una lista.
+bool insertElementC(tItemC item, tListC *L); // Función que inserta un elemento dado al final de una lista.
 
-void RemoveElementC(tPosC p, tListC *L); // Función que remueve un elemento en la posición dada de una lista.
+void removeElementC(tPosC p, tListC *L); // Función que remueve un elemento en la posición dada de una lista.
 
-void DisplayListC(tListC L); // Función que muestra todos los elementos de una lista.
+void displayListC(tListC L); // Función que muestra todos los elementos de una lista.
+
+void freeListC(tListC *L); // Función que libera la memoria de una lista.
 
 #endif

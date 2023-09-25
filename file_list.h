@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
 
 #define MAX_FILES 4096
 #define FNULL NULL
@@ -34,6 +35,8 @@ bool isEmptyF(tListF L); // Función que devuelve si una lista está vacía o no
 
 void createListF(tListF *L); // Función que crea una lista vacía.
 
+bool insertStdFiles (tListF *L);        // Inserta los ficheros estándar
+
 tPosF nextF(tPosF pos, tListF L); // Función que accede a la siguiente posición a una dada en una lista.
 
 tPosF lastF(tListF L); // Función que accede a la última posición de una lista.
@@ -43,5 +46,7 @@ bool insertElementF(tItemF item, tListF *L); // Función que inserta un elemento
 void removeElementF(tPosF p, tListF *L); // Función que remueve un elemento en la posición dada de una lista.
 
 void displayListF(tListF L); // Función que muestra todos los elementos de una lista.
+
+void freeListF(tListF *L); // Función que libera la memoria de una lista.
 
 #endif

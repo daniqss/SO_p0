@@ -68,3 +68,20 @@ void displayListC(tListC L) {
         printf(" %s \n", p->data);
     } // Recorremos la lista y mostramos cada elemento
 }
+
+void freeListC(tListC *L) {
+    tPosC p;
+    int i = 0;
+    printf("Liberando lista de comandos\n");
+
+    while (!isEmptyC(*L)) {
+        if (i == 0) printf("entrando al buqle n%d\n", i);
+        p = *L;
+        printf("%d\n", i);
+
+        *L = nextC(*L, *L);
+        i++;
+
+        removeElementC(p, L);
+    }
+}
