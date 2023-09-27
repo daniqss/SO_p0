@@ -41,6 +41,9 @@ void cmd_open(char *arguments[MAX], int nArguments, tListF *fileList);
 
 void cmd_close (char *arguments[MAX], tListF *fileList);
 
+void cmd_dup (char *arguments[MAX], tListF *fileList);
+
+void cmd_help(char *arguments[MAX], int nArguments);
 
 
 int main() {
@@ -60,8 +63,7 @@ int main() {
     do {
         printPrompt();
         readInputs(cmd, arguments, &nArguments);
-        quit = processCommand(arguments, nArguments, &fileList);
-    } while (quit);
+    } while (processCommand(arguments, nArguments, &fileList));
 
 
     freeMemory(cmd, arguments, nArguments, &commandList, &fileList);
@@ -112,6 +114,8 @@ bool processCommand(char *arguments[MAX], int nArguments, tListF * fileList) {
         cmd_open(arguments, nArguments, fileList);
     else if (strcmp(arguments[0],"close")==0)
         cmd_close(arguments, fileList);
+    else if (strcmp(arguments[0],"dup")==0)
+        cmd_dup(arguments, fileList);
 
     else if ((strcmp(arguments[0], "quit") == 0) || (strcmp(arguments[0], "bye") == 0) ||
              (strcmp(arguments[0], "exit") == 0))
@@ -279,10 +283,31 @@ void cmd_close (char *arguments[MAX], tListF *fileList) {
 
     if (arguments[1]==NULL || (fileDescriptor=atoi(arguments[1]))<0) {
         displayListF(*fileList);
+        return;
     }
     if (close(fileDescriptor)==-1)
         perror("Imposible cerrar descriptor");
     else {
         removeElementF(findElementF(fileDescriptor, *fileList), fileList);
     }
+}
+
+void cmd_dup (char *arguments[MAX], tListF *fileList) { 
+    int fileDescriptor, newFileDescriptor;
+    tPosF file;
+    char aux[MAX];
+    
+    if (arguments[1]==NULL || (fileDescriptor=atoi(arguments[1]))<0) {
+        displayListF(*fileList);
+        return;
+    }
+    if ((file = findElementF(fileDescriptor, *fileList)) == NULL) {
+        printf("Imposible duplicar descriptor: Bad file descriptor\n");
+        return;
+    }
+    fileDescriptor = file->data.descriptor;
+    newFileDescriptor = dup(fileDescriptor);
+
+    sprintf (aux,"dup %d (%s)",fileDescriptor, file->data.fileName);
+    insertElementF((tItemF) {aux, newFileDescriptor, file->data.mode}, fileList);
 }
