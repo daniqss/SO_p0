@@ -5,7 +5,7 @@ bool isEmptyF(tListF L) {
 }
 
 void createListF(tListF *L) {
-    L = FNULL;
+    *L = NULL;
 }
 
 
@@ -28,14 +28,14 @@ bool insertElementF(tItemF item, tListF *L){
     tPosF p, q;
     if (!createNodeF(&q)) {
         free(q);
-        printf("Node creation failed\n");
         return false;
     }
-
     // Devuelve false si no hemos podido crear el nodo
     q->data.fileName = (char *) malloc(strlen(item.fileName) + 1); // Asigna memoria dinámica para fileName
+
     if (q->data.fileName == NULL) {
         printf("Memory allocation for fileName failed\n");
+        free(q->data.fileName);
         free(q);
         return false;
     }
@@ -43,10 +43,10 @@ bool insertElementF(tItemF item, tListF *L){
     q->data.descriptor = item.descriptor;
     q->data.mode = item.mode;
     q->next = FNULL;
-
     // If list is empty, insert element as first element
-    if (isEmptyF(*L))
+    if (isEmptyF(*L)) {
         *L = q;
+    }
     else {
         // Else, insert element at the end of the list
         p = lastF(*L);
@@ -85,45 +85,68 @@ tPosF findElementF(int fileDescriptor, tListF L) {
 }
 
 char *getModeString (int mode) {
-    switch (mode) {
-    case O_CREAT:
-        return "O_CREAT";
-        break;
-    case O_EXCL:
-        return "O_EXCL";
-        break;
-    case O_RDONLY:
-        return "O_RDONLY";
-        break;
-    case O_WRONLY:
-        return "O_WRONLY";
-        break;
-    case O_RDWR:
-        return "O_RDWR";
-        break;
-    case O_APPEND:
-        return "O_APPEND";
-        break;
-    case O_TRUNC:
-        return "O_TRUNC";
-        break;
-    default:
-        return "Error";
-        break;
+    const char *modeString[] = {"O_CREAT", "O_EXCL", "O_RDONLY", "O_WRONLY", "O_RDWR", "O_APPEND", "O_TRUNC"};
+    char *resultString = (char *) malloc(58);
+
+    /*
+    O_EXCL     Exclusivo, se usa generalmente con O_CREAT  00000010 2
+    O_RDONLY   Lectura solamente 00000100 4
+    O_CREAT    Representa la creación del archivo  00000001 1
+    O_WRONLY   Escritura solamente  00001000 8
+    O_RDWR     Lectura/Escritura  00010000 16
+    O_APPEND   Adjuntar  00100000 32
+    O_TRUNC    Truncar  01000000 64
+    */
+
+    if (mode & O_CREAT) {
+        strcat(resultString, modeString[0]);
+        strcat(resultString, " ");
     }
+    if (mode & O_EXCL) {
+        strcat(resultString, modeString[1]);
+        strcat(resultString, " ");
+    }
+    if (mode & O_RDONLY) {
+        strcat(resultString, modeString[2]);
+        strcat(resultString, " ");
+    }
+    if (mode & O_WRONLY) {
+        strcat(resultString, modeString[3]);
+        strcat(resultString, " ");
+    }
+    if (mode & O_RDWR) {
+        strcat(resultString, modeString[4]);
+        strcat(resultString, " ");
+    }
+    if (mode & O_APPEND) {
+        strcat(resultString, modeString[5]);
+        strcat(resultString, " ");
+    }
+    if (mode & O_TRUNC) {
+        strcat(resultString, modeString[6]);
+        strcat(resultString, " ");
+    }
+    return resultString;
+
+
 }
 
 void displayListF(tListF L) {
     tPosF p;
+    char *modeString;
+
     for (p = L; p != FNULL; p = nextF(p, L)) {
-        printf("descriptor: %d -> %s %s\n", p->data.descriptor,p->data.fileName, getModeString(p->data.mode));
+        modeString = getModeString(p->data.mode);
+        printf("descriptor: %d -> %s %s\n", p->data.descriptor,p->data.fileName, modeString);
+        free(modeString);
+        modeString = NULL;
     } // Recorremos la lista y mostramos cada elemento
 }
 
 void freeListF(tListF *L) {
     tPosF p;
 
-    if(!isEmptyF(*L)) { 
+    if(!isEmptyF(*L)) {
         for(p=(*L); p!=NULL; p=nextF(p,*L)) { // Iteramos por todos los jurados de la lista.
             printf("liberando %s\n", p->data.fileName);
             removeElementF(p, L);
