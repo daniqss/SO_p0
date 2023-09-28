@@ -120,8 +120,6 @@ void displayListC(tListC L) {
 }
 
 void freeListC(tListC *L) {
-    while(!isEmptyC(*L)) {
-            printf("Eliminando %s\n", (*L)->data);
-            removeElementC(*L, L);
-    }
+    while(!isEmptyC(*L))
+        removeElementC(*L, L);
 }

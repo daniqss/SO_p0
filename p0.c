@@ -78,7 +78,6 @@ int main() {
         freeMemory(cmd, arguments, nArguments, &commandList, &fileList, quit);
     } while (quit);
 
-
     return EXIT_SUCCESS;
 }
 
@@ -92,18 +91,21 @@ void readInputs(char *cmd, char *arguments[], int *nArguments, tListC *commandLi
     char *inputCopy;
 
     bytesRead = getline(&cmd, &bufferSize, stdin); // getline devuelve el número de bytes escritos si no hay errores
+    cmd[bytesRead - 1] = '\0';
     inputCopy = strdup(cmd);
-
-    inputCopy[strlen(inputCopy)-1] = '\0';
 
 
     if (bytesRead == -1 || !insertElementC(inputCopy, commandList)) {
         perror("Lectura fallida");
         exit(EXIT_FAILURE);
     }
-    *nArguments = chopCmd(cmd, arguments);
 
-    free(inputCopy);
+    *nArguments = chopCmd(inputCopy, arguments);
+
+    if (inputCopy != NULL) {
+        free(inputCopy);
+        inputCopy = NULL;
+    }
 }
 
 int chopCmd(char *cmd, char *tokens[]) {
@@ -114,6 +116,23 @@ int chopCmd(char *cmd, char *tokens[]) {
         i++;
     return i;
 }
+
+// int chopCmd(char *cmd, char *tokens[]) {
+//     int i = 1;
+//     char *token;
+
+//     if ((token = strtok(cmd, " \n\t")) == NULL)
+//         return 0;
+
+//     tokens[0] = strdup(token);
+
+//     while ((token = strtok(NULL, " \n\t")) != NULL) {
+//         tokens[i] = strdup(token);
+//         i++;
+//     }
+
+//     return i;
+// }
 
 bool processCommand(char *arguments[MAX], int nArguments, int *recursiveCount, tListF * fileList, tListC * commandList) {
     if(*recursiveCount > 10){
@@ -154,11 +173,17 @@ bool processCommand(char *arguments[MAX], int nArguments, int *recursiveCount, t
 }
 
 void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *commandList, tListF *fileList, bool quit) {
-    if (cmd != NULL)
+    // for (int i = 0; i < nArguments; i++) {
+    //     if (arguments[i] != NULL) {
+    //         free(arguments[i]);
+    //         arguments[i] = NULL;
+    //         printf("liberado arguments[%d]\n", i);
+    //     }
+    // }
+    if (cmd != NULL) {
         free(cmd);
-    for (int i = 0; i < nArguments; i++) {
-        if (arguments[i] != NULL)
-                free(arguments[i]);
+        cmd = NULL;
+        printf("liberado cmd\n");
     }
 
     if (!quit) {

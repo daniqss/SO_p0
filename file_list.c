@@ -68,7 +68,6 @@ void removeElementF(tPosF p, tListF *L) {
         for (q = *L; (q->next != FNULL) && (q->next != p); q = nextF(q));
         q->next = FNULL;
         // Si queremos eliminar la última posición hacemos que la lista acabe en el penúltimo elemento
-        
     }
     else {
         q = nextF(p);
@@ -79,7 +78,6 @@ void removeElementF(tPosF p, tListF *L) {
         p->next = q->next;
         p = q;
     }
-
     free(p->data.fileName);
     free(p);
 }
@@ -141,10 +139,8 @@ void displayListF(tListF L) {
 }
 
 void freeListF(tListF *L) {
-    while(!isEmptyF(*L)) {
-            printf("Eliminando %s\n", (*L)->data.fileName);
-            removeElementF(*L, L);
-    }
+    while(!isEmptyF(*L))
+        removeElementF(*L, L);
 }
 
 bool insertStdFiles (tListF *L) {
@@ -152,18 +148,14 @@ bool insertStdFiles (tListF *L) {
         perror("Error al insertar stdin");
         return false;
     }
-    printf("insertado stdin\n");
     if (!insertElementF((tItemF) {"stdout", 1, O_RDWR}, L)) {
         perror("Error al insertar stdout");
         return false;
     }
-        printf("insertado stdout\n");
-
     if (!insertElementF((tItemF) {"stderr", 2, O_RDWR}, L)) {
         perror("Error al insertar stderr");
         return false;
     }
-        printf("insertado stderr\n");
 
     return true;
 }
