@@ -60,7 +60,7 @@ bool insertElementF(tItemF item, tListF *L){
 
 void removeElementF(tPosF p, tListF *L) {
     tPosF q;
-    if (p == *L) 
+    if (p == *L)
         *L = nextF(*L);
         // Si queremos eliminar la primera posición hacemos que la lista empiece en la siguiente
 
@@ -68,7 +68,7 @@ void removeElementF(tPosF p, tListF *L) {
         for (q = *L; (q->next != FNULL) && (q->next != p); q = nextF(q));
         q->next = FNULL;
         // Si queremos eliminar la última posición hacemos que la lista acabe en el penúltimo elemento
-        
+
     }
     else {
         q = nextF(p);
@@ -111,19 +111,19 @@ char *getModeString (int mode) {
     O_TRUNC    Truncar  01000000 64
     */
 
-    if (mode & O_CREAT) 
+    if (mode & O_CREAT)
         strcat(resultString, "O_CREAT ");
-    if (mode & O_EXCL) 
+    if (mode & O_EXCL)
         strcat(resultString, "O_EXCL ");
-    if (mode & O_RDONLY) 
+    if (mode & O_RDONLY)
         strcat(resultString, "O_RDONLY ");
-    if (mode & O_WRONLY) 
+    if (mode & O_WRONLY)
         strcat(resultString, "O_WRONLY ");
     if (mode & O_RDWR)
         strcat(resultString, "O_RDWR ");
-    if (mode & O_APPEND) 
+    if (mode & O_APPEND)
         strcat(resultString, "O_APPEND ");
-    if (mode & O_TRUNC) 
+    if (mode & O_TRUNC)
         strcat(resultString, "O_TRUNC ");
     strcat(resultString, "\0");
     return resultString;
@@ -142,8 +142,8 @@ void displayListF(tListF L) {
 
 void freeListF(tListF *L) {
     while(!isEmptyF(*L)) {
-            printf("Eliminando %s\n", (*L)->data.fileName);
-            removeElementF(*L, L);
+        printf("Eliminando %s\n", (*L)->data.fileName);
+        removeElementF(*L, L);
     }
 }
 
@@ -152,18 +152,15 @@ bool insertStdFiles (tListF *L) {
         perror("Error al insertar stdin");
         return false;
     }
-    printf("insertado stdin\n");
     if (!insertElementF((tItemF) {"stdout", 1, O_RDWR}, L)) {
         perror("Error al insertar stdout");
         return false;
     }
-        printf("insertado stdout\n");
 
     if (!insertElementF((tItemF) {"stderr", 2, O_RDWR}, L)) {
         perror("Error al insertar stderr");
         return false;
     }
-        printf("insertado stderr\n");
 
     return true;
 }

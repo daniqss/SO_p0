@@ -22,15 +22,6 @@ tPosC lastC(tListC L) {
     return p;
 } // Buscamos la última posición y la devolvemos
 
-tPosC prev(tPosC p, tListC L){
-    tPosC q;
-    if(p == firstC(L))
-        q = CNULL;
-    else
-        for(q = firstC(L); nextC(q)!=CNULL && nextC(q)!=p; q= nextC(q));
-    return q;
-}
-
 bool createNodeC(tPosC *p) {
     *p = malloc(sizeof(struct tNodeC));
     return *p != CNULL;
@@ -112,6 +103,7 @@ void displayListC(tListC L) {
         cnt = cnt + 1;
     } // Recorremos la lista y mostramos cada elemento
 }
+
 
 void freeListC(tListC *L) {
     tPosC p;

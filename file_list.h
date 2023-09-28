@@ -1,7 +1,3 @@
-//
-// Created by ranicocs on 14/09/23.
-//
-
 #ifndef FILE_LIST_H
 #define FILE_LIST_H
 

@@ -14,11 +14,14 @@
 #define CNULL NULL
 
 typedef char *tItemC;
+typedef void *FunctionPointer();
 typedef struct tNodeC *tPosC;
 
 struct tNodeC
 {
     tItemC data;
+    tItemC description;
+
     tPosC next;
 };
 
