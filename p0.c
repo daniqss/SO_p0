@@ -74,6 +74,7 @@ int main() {
         printPrompt();
         readInputs(cmd, arguments, &nArguments, &commandList);
         quit = processCommand(arguments, nArguments, &recursiveCount , &fileList, &commandList);
+
         freeMemory(cmd, arguments, nArguments, &commandList, &fileList, quit);
     } while (quit);
 
@@ -85,66 +86,19 @@ void printPrompt() {
     printf("-> ");
 }
 
-// void readInputs(char *cmd, char *arguments[], int *nArguments, tListC *commandList) {
-//     ssize_t bytesRead; // ssize_t y size_t son unsigned int
-//     size_t bufferSize = 0;
-//     char *inputCopy;
+void readInputs(char *cmd, char *arguments[], int *nArguments, tListC *commandList) {
+    ssize_t bytesRead; // ssize_t y size_t son unsigned int
+    size_t bufferSize = 0;
+    char *inputCopy;
 
-//     bytesRead = getline(&cmd, &bufferSize, stdin); // getline devuelve el número de bytes escritos si no hay errores
-//     inputCopy = strdup(cmd);
-
-//     inputCopy[strlen(inputCopy)-1] = '\0';
-
-
-//     if (bytesRead == -1 || !insertElementC(inputCopy, commandList)) {
-//         perror("Lectura fallida");
-//         exit(EXIT_FAILURE);
-//     }
-//     *nArguments = chopCmd(cmd, arguments);
-
-//     free(inputCopy);
-// }
-
-void readInputs(char* cmd, char *arguments[], int *nArguments, tListC *commandList) {
-    size_t stringSize= 0;
-    size_t newSize = 0;
-    char *inputCopy = NULL;
-    char *newCmd = NULL;
-    bool aux = true;
-    int actualCharacter;
-
-    if((cmd = (char *) malloc(BUFFER_SIZE)) == NULL) {
-        perror("Memory allocation error");
-        exit(EXIT_FAILURE);
-    }
-
-    while (aux) {
-        actualCharacter = getchar();
-        if (actualCharacter == '\n') {
-            cmd[stringSize] = '\0';
-            aux = false;
-        }
-        else {
-            cmd[stringSize] = (char)actualCharacter;
-            stringSize++;
-
-            if (stringSize == BUFFER_SIZE) {
-                newSize += BUFFER_SIZE;
-                printf("Reallocating memory...\n");
-                if (((newCmd = (char *) realloc(cmd, newSize))) == NULL) {
-                    perror("Memory reallocation error");
-                    exit(EXIT_FAILURE);
-                }
-                cmd = newCmd;
-                newCmd = NULL;
-            }
-        }
-    }
-
+    bytesRead = getline(&cmd, &bufferSize, stdin); // getline devuelve el número de bytes escritos si no hay errores
     inputCopy = strdup(cmd);
 
-    if (!insertElementC(inputCopy, commandList)) {
-        perror("Insertion in file list failed");
+    inputCopy[strlen(inputCopy)-1] = '\0';
+
+
+    if (bytesRead == -1 || !insertElementC(inputCopy, commandList)) {
+        perror("Lectura fallida");
         exit(EXIT_FAILURE);
     }
     *nArguments = chopCmd(cmd, arguments);
@@ -200,14 +154,16 @@ bool processCommand(char *arguments[MAX], int nArguments, int *recursiveCount, t
 }
 
 void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *commandList, tListF *fileList, bool quit) {
-    free(cmd);
+    if (cmd != NULL)
+        free(cmd);
+    for (int i = 0; i < nArguments; i++) {
+        if (arguments[i] != NULL)
+                free(arguments[i]);
+    }
 
     if (!quit) {
-    for (int i = 0; i < nArguments; i++)
-        free(arguments[i]);
-
-    freeListF(fileList);
-    freeListC(commandList);
+        freeListF(fileList);
+        freeListC(commandList);
     }
 }
 
