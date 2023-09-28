@@ -354,13 +354,10 @@ void cmd_listopen(tListF *fileList){
 void cmd_open(char *arguments[MAX], int nArguments, tListF *fileList) {
     int i, fileDescriptor, mode = 0;
 
-    if (nArguments == 1) {
+    if (nArguments == 1)
         // Listar archivos abiertos
-        if (isEmptyF(*fileList))
-            printf("No hay archivos abiertos");
-        else 
-            displayListF(*fileList);
-    } else {
+        cmd_listopen(fileList);
+    else {
 
         for (i = 2; arguments[i] != NULL; i++) {
             if (!strcmp(arguments[i], "cr"))
@@ -394,7 +391,7 @@ void cmd_close (char *arguments[MAX], tListF *fileList) {
     int fileDescriptor;
 
     if (arguments[1]==NULL || (fileDescriptor=atoi(arguments[1]))<0) {
-        displayListF(*fileList);
+        cmd_listopen(fileList);
         return;
     }
     if (close(fileDescriptor)==-1)
@@ -410,7 +407,7 @@ void cmd_dup (char *arguments[MAX], tListF *fileList) {
     char aux[MAX];
 
     if (arguments[1]==NULL || (fileDescriptor=atoi(arguments[1]))<0) {
-        displayListF(*fileList);
+        cmd_listopen(fileList);
         return;
     }
     if ((file = findElementF(fileDescriptor, *fileList)) == NULL) {
