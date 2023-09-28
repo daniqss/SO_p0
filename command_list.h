@@ -14,13 +14,11 @@
 #define CNULL NULL
 
 typedef char *tItemC;
-typedef void *FunctionPointer();
 typedef struct tNodeC *tPosC;
 
 struct tNodeC
 {
     tItemC data;
-    tItemC description;
 
     tPosC next;
 };
@@ -39,7 +37,7 @@ bool insertElementC(tItemC item, tListC *L); // Función que inserta un elemento
 
 void removeElementC(tPosC p, tListC *L); // Función que remueve un elemento en la posición dada de una lista.
 
-tItemC getNthElement(int n, tListC L);
+bool getNthElement(int n, tListC L, tItemC *item);
 
 void displayNFirstElements(int n, tListC L);
 

@@ -34,28 +34,30 @@ bool insertElementC(tItemC item, tListC *L) {
         printf("Node creation failed\n");
         return false;
     }
+    // Devuelve false si no hemos podido crear el nodo
     q->data= (char *) malloc(strlen(item) + 1); // Asigna memoria dinámica para fileName
     if (q->data == NULL) {
         printf("Memory allocation for fileName failed\n");
+        free(q->data);
         free(q);
         return false;
     }
     // Devuelve false si no hemos podido crear el nodo
-    else {
-        q->data = item;
-        q->next = CNULL;
-        //If list is empty, insert element as first element
-        if (isEmptyC(*L))
-            *L = q;
-        else{
-            p = lastC(*L);
-            p->next = q;
-        }
-        //Else, insert element at the end of the list
-        return true;
-    } // Creamos el elemento, lo insertamos al final y devolvemos un "true", ya que hemos podido insertar el elemento.
-}
 
+    strcpy(q->data, item);
+    q->next = CNULL;
+    //If list is empty, insert element as first element
+
+    if (isEmptyC(*L))
+        *L = q;
+    else{
+        p = lastC(*L);
+        p->next = q;
+    }
+    //Else, insert element at the end of the list
+    return true;
+    // Creamos el elemento, lo insertamos al final y devolvemos un "true", ya que hemos podido insertar el elemento.
+}
 void removeElementC(tPosC p, tListC *L) {
     tPosC q;
     if (p == *L) // Si queremos eliminar la primera posición hacemos que la lista empiece en la siguiente
@@ -75,14 +77,17 @@ void removeElementC(tPosC p, tListC *L) {
     // Si queremos eliminar una posición intermedia duplicamos el siguiente nodo en esa posición y hacemos que "p" apunte al siguiente.
 }
 
-tItemC getNthElement(int n, tListC L){
+bool getNthElement(int n, tListC L, tItemC *item){
     tPosC p;
-    tItemC item;
     int cnt=0;
-    for (p = L; p!= CNULL && cnt != n ; p = nextC(p))
+    for (p = L; (p!= CNULL) && (cnt != n) ; p = nextC(p))
         cnt = cnt + 1;
-    item = p->data;
-    return item;
+    if (p!=CNULL){
+        *item = p->data;
+        return true;
+    }
+    else
+        return false;
 }
 
 void displayNFirstElements(int n, tListC L) {
@@ -106,12 +111,8 @@ void displayListC(tListC L) {
 
 
 void freeListC(tListC *L) {
-    tPosC p;
-
-    if(!isEmptyC(*L)) {
-        for(p=(*L); p!=CNULL; p=nextC(p)) { // Iteramos por todos los jurados de la lista.
-            printf("liberando %s\n", p->data);
-            removeElementC(p, L);
-        }
+    while(!isEmptyC(*L)) {
+        printf("Eliminando %s\n", (*L)->data);
+        removeElementC(*L, L);
     }
 }

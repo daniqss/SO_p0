@@ -30,7 +30,7 @@ void printPrompt();
 bool processCommand(char *arguments[MAX], int nArguments, int * recursiveCount, tListF * fileList, tListC * comandList);
 //Identifica a que comando se refiere la entrada y lo llama.
 
-void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *commandList, tListF *fileList);
+void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *commandList, tListF *fileList, bool quit);
 //Libera todos los archivos generados durante la ejecución del programa
 
 void cmd_authors(char *arguments[MAX], int nArguments);
@@ -42,7 +42,7 @@ void cmd_authors(char *arguments[MAX], int nArguments);
  */
 void cmd_pid(char *arguments[MAX], int nArguments);
 /*
- * Muestra el pid del del proceso que se esta ejecutando en el shell:
+ * Muestra el pid del proceso que se está ejecutando en el shell:
  * Adicionalmente, si agregamos a la entrada un:
  *  -p Muestra el pid del proceso padre del proceso
  */
@@ -107,6 +107,7 @@ int main() {
     char *arguments[MAX];
     int nArguments;
     int recursiveCount = 0;
+    bool quit;
 
     tListC commandList;
     createListC(&commandList); //Creamos el historial
@@ -120,10 +121,11 @@ int main() {
     do {
         printPrompt();
         readInputs(cmd, arguments, &nArguments, &commandList);
-    } while (processCommand(arguments, nArguments, &recursiveCount , &fileList, &commandList));
+        quit = processCommand(arguments, nArguments, &recursiveCount , &fileList, &commandList);
 
+        freeMemory(cmd, arguments, nArguments, &commandList, &fileList, quit);
+    } while (quit);
 
-    freeMemory(cmd, arguments, nArguments, &commandList, &fileList); //Liberamos la memoria al finalizar el programa
     return EXIT_SUCCESS;
 }
 
@@ -156,6 +158,8 @@ void readInputs(char *cmd, char *arguments[], int *nArguments, tListC *commandLi
         exit(EXIT_FAILURE);
     }
     *nArguments = chopCmd(cmd, arguments); //Dividimos la entrada en "argumentos" (separamos el input por espacios en blanco)
+
+    free(inputCopy);
 }
 
 int chopCmd(char *cmd, char *tokens[]) {
@@ -206,18 +210,18 @@ bool processCommand(char *arguments[MAX], int nArguments, int *recursiveCount, t
     return true;
 }
 
-void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *commandList, tListF *fileList) {
-    printf("Liberando...\n");
-    free(cmd);
+void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *commandList, tListF *fileList, bool quit) {
+    if (cmd != NULL)
+        free(cmd);
     for (int i = 0; i < nArguments; i++) {
-        free(arguments[i]);
+        if (arguments[i] != NULL)
+            free(arguments[i]);
     }
 
-    freeListF(fileList);
-    printf("Liberada lista de ficheros...\n");
-
-    freeListC(commandList);
-    printf("Liberada lista de comandos...\n");
+    if (!quit) {
+        freeListF(fileList);
+        freeListC(commandList);
+    }
 }
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -321,11 +325,11 @@ bool esEnteroPositivo(const char *cadena,int *numero){
         return false;
     char *temp;
     *numero = (int)strtol(cadena,  &temp, 10); //Guarda los números y en temp el resto de caracteres
-    if (*temp == '\0' && *numero > 0) //Si no hay otros caracteres o el número es mayor que cero devolvemos true.
+    if (*temp == '\0' && *numero >= 0) //Si no hay otros caracteres o el número es mayor igual que cero devolvemos true.
         return true;
     else
         return false;
-}//Función auxiliar que comprueba si una cadena esta compuesta solo de digitos (por lo tanto un número positivo).
+}//Función auxiliar que comprueba si una cadena está compuesta solo de dígitos (por lo tanto un número positivo).
 
 void cmd_hist(char *arguments[MAX], int nArguments, tListC *commandList){
     size_t len = sizeof(arguments[1])-1;
@@ -374,11 +378,15 @@ void cmd_command(char *arguments[MAX], int nArguments, int *recursiveCount, tLis
             break;
         case 2:
             if(esEnteroPositivo(arguments[1],&numero)){
-                command = strdup(getNthElement(numero,*commandList));
-                printf("Ejecutando hist (%d): %s \n",numero,command);
-                nArgumentsHist = chopCmd(command, argumentsHist);
-                (*recursiveCount)++;
-                processCommand(argumentsHist, nArgumentsHist, recursiveCount, fileList, commandList);
+                if(!getNthElement(numero,*commandList,&command)) //Comprueba si existe el Nth elemento en la lista
+                    printf("No hay elemento %d en el historico \n",numero);
+                else{
+                    command = strdup(command); //Duplicamos la lista, para evitar los problemas de memoria
+                    printf("Ejecutando hist (%d): %s \n",numero,command);
+                    nArgumentsHist = chopCmd(command, argumentsHist); //Conseguimos el número de argumentos
+                    (*recursiveCount)++; //Aumentamos el contador de recursividad
+                    processCommand(argumentsHist, nArgumentsHist, recursiveCount, fileList, commandList);
+                }
                 free(command);
             }
             else{
@@ -499,14 +507,14 @@ void cmd_help(char *arguments[MAX], int nArguments) {
             } else if (strcmp(comando, "command") == 0) {
                 printf("command [-N] \t Repite el comando N (del historial)\n");
             } else if (strcmp(comando, "open") == 0) {
-                printf("open fich m1 m2... \t Abre el fichero fich y lo añade a la lista de ficheros abiertos del shell\n");
+                printf("open fich m1 m2... \t Abre el fichero fich. y lo añade a la lista de ficheros abiertos del shell\n");
                 printf("\tm1, m2... es el modo de apertura (or bit a bit de los siguientes).\n");
                 printf("\tcr: O_CREAT\tap: O_APPEND\n");
                 printf("\tex: O_EXCL \tro: O_RDONLY\n");
                 printf("\trw: O_RDWR \two: O_WRONLY\n");
                 printf("\ttr: O_TRUNC\n");
             } else if (strcmp(comando, "close") == 0) {
-                printf("close df \t Cierra el descriptor df y elimina el correspondiente fichero de la lista de ficheros abiertos\n");
+                    printf("close df \t Cierra el descriptor df y elimina el correspondiente fichero de la lista de ficheros abiertos\n");
             } else if (strcmp(comando, "dup") == 0) {
                 printf("dup df \t Duplica el descriptor de fichero df y añade una nueva entrada a la lista de ficheros abiertos\n");
             } else if (strcmp(comando, "listopen") == 0) {

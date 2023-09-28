@@ -161,6 +161,5 @@ bool insertStdFiles (tListF *L) {
         perror("Error al insertar stderr");
         return false;
     }
-
     return true;
 }
