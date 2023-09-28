@@ -347,7 +347,8 @@ void cmd_listopen(tListF *fileList){
     // Listar archivos abiertos
     if (isEmptyF(*fileList))
         printf("No hay archivos abiertos");
-    displayListF(*fileList);
+    else 
+        displayListF(*fileList);
 }
 
 void cmd_open(char *arguments[MAX], int nArguments, tListF *fileList) {
@@ -357,7 +358,8 @@ void cmd_open(char *arguments[MAX], int nArguments, tListF *fileList) {
         // Listar archivos abiertos
         if (isEmptyF(*fileList))
             printf("No hay archivos abiertos");
-        displayListF(*fileList);
+        else 
+            displayListF(*fileList);
     } else {
 
         for (i = 2; arguments[i] != NULL; i++) {

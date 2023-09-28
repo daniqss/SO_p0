@@ -85,8 +85,13 @@ tPosF findElementF(int fileDescriptor, tListF L) {
 }
 
 char *getModeString (int mode) {
-    const char *modeString[] = {"O_CREAT", "O_EXCL", "O_RDONLY", "O_WRONLY", "O_RDWR", "O_APPEND", "O_TRUNC"};
     char *resultString = (char *) malloc(58);
+    if (resultString == NULL) {
+        printf("Memory allocation for modeString failed\n");
+        return "Error allocating memory for modeString\n";
+    } else {
+        strcpy(resultString, "");
+    }
 
     /*
     O_EXCL     Exclusivo, se usa generalmente con O_CREAT  00000010 2
@@ -98,37 +103,22 @@ char *getModeString (int mode) {
     O_TRUNC    Truncar  01000000 64
     */
 
-    if (mode & O_CREAT) {
-        strcat(resultString, modeString[0]);
-        strcat(resultString, " ");
-    }
-    if (mode & O_EXCL) {
-        strcat(resultString, modeString[1]);
-        strcat(resultString, " ");
-    }
-    if (mode & O_RDONLY) {
-        strcat(resultString, modeString[2]);
-        strcat(resultString, " ");
-    }
-    if (mode & O_WRONLY) {
-        strcat(resultString, modeString[3]);
-        strcat(resultString, " ");
-    }
-    if (mode & O_RDWR) {
-        strcat(resultString, modeString[4]);
-        strcat(resultString, " ");
-    }
-    if (mode & O_APPEND) {
-        strcat(resultString, modeString[5]);
-        strcat(resultString, " ");
-    }
-    if (mode & O_TRUNC) {
-        strcat(resultString, modeString[6]);
-        strcat(resultString, " ");
-    }
+    if (mode & O_CREAT) 
+        strcat(resultString, "O_CREAT ");
+    if (mode & O_EXCL) 
+        strcat(resultString, "O_EXCL ");
+    if (mode & O_RDONLY) 
+        strcat(resultString, "O_RDONLY ");
+    if (mode & O_WRONLY) 
+        strcat(resultString, "O_WRONLY ");
+    if (mode & O_RDWR)
+        strcat(resultString, "O_RDWR ");
+    if (mode & O_APPEND) 
+        strcat(resultString, "O_APPEND ");
+    if (mode & O_TRUNC) 
+        strcat(resultString, "O_TRUNC ");
+    strcat(resultString, "\0");
     return resultString;
-
-
 }
 
 void displayListF(tListF L) {
@@ -139,7 +129,6 @@ void displayListF(tListF L) {
         modeString = getModeString(p->data.mode);
         printf("descriptor: %d -> %s %s\n", p->data.descriptor,p->data.fileName, modeString);
         free(modeString);
-        modeString = NULL;
     } // Recorremos la lista y mostramos cada elemento
 }
 
@@ -159,13 +148,18 @@ bool insertStdFiles (tListF *L) {
         perror("Error al insertar stdin");
         return false;
     }
+    printf("insertado stdin\n");
     if (!insertElementF((tItemF) {"stdout", 1, O_RDWR}, L)) {
         perror("Error al insertar stdout");
         return false;
     }
+        printf("insertado stdout\n");
+
     if (!insertElementF((tItemF) {"stderr", 2, O_RDWR}, L)) {
         perror("Error al insertar stderr");
         return false;
     }
+        printf("insertado stderr\n");
+
     return true;
 }
