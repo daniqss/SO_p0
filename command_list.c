@@ -5,7 +5,7 @@ bool isEmptyC(tListC L) {
 }
 
 void createListC(tListC *L) {
-    L = CNULL;
+    *L = CNULL;
 }
 
 tPosC firstC(tListC L){
