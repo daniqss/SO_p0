@@ -31,6 +31,6 @@ run: $(TARGET)
 
 # Ejecutar Valgrind
 valgrind: $(TARGET)
-	valgrind --leak-check=full ./$(TARGET)
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(TARGET)
 
 .PHONY: all clean valgrind run

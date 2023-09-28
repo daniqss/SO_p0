@@ -1,7 +1,3 @@
-//
-// Created by ranicocs on 14/09/23.
-//
-
 #ifndef FILE_LIST_H
 #define FILE_LIST_H
 
@@ -10,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #define MAX_FILES 4096
 #define FNULL NULL
@@ -37,7 +34,7 @@ void createListF(tListF *L); // Función que crea una lista vacía.
 
 bool insertStdFiles (tListF *L);        // Inserta los ficheros estándar
 
-tPosF nextF(tPosF pos, tListF L); // Función que accede a la siguiente posición a una dada en una lista.
+tPosF nextF(tPosF pos); // Función que accede a la siguiente posición a una dada en una lista.
 
 tPosF lastF(tListF L); // Función que accede a la última posición de una lista.
 

@@ -1,14 +1,10 @@
-# Node.js
-/node_modules
+# Ignorar todos los archivos
+*
 
-# npm
-package-lock.json
-package.json
-npm-debug.log
-.prettierrc
-
-# CLion
-.idea/
-
-# VSCode
-.vscode/
+# Excepto p0.c, file_list.h y file_list.c
+!p0.c
+!file_list.h
+!file_list.c
+!command_list.h
+!command_list.c
+!makefile

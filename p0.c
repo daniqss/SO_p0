@@ -9,19 +9,20 @@
 #include <time.h>
 #include "file_list.h"
 #include "command_list.h"
+#include<time.h>
 
 #define MAX 1024
 #define BUFFER_SIZE 1024
 
-void readInputs(char *cmd, char *arguments[], int *nArguments); //Lee las entradas
+void readInputs(char *cmd, char *arguments[], int *nArguments, tListC *commandList); //Lee las entradas
 
 int chopCmd(char *cmd, char *tokens[]); //Divide a entrada de comandos
 
 void printPrompt(); //Imprime Prompt
 
-bool processCommand(char *arguments[MAX], int nArguments, tListF *fileList);
+bool processCommand(char *arguments[MAX], int nArguments, int * recursiveCount, tListF * fileList, tListC * comandList);
 
-void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *commandList, tListF *fileList);
+void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *commandList, tListF *fileList, bool quit);
 
 //Comandos
 
@@ -37,6 +38,12 @@ void cmd_time();
 
 void cmd_infosys(char *arguments[MAX], int nArguments);
 
+void cmd_hist(char *arguments[MAX], int nArguments, tListC *commandList);
+
+void cmd_command(char *arguments[MAX], int nArguments, int *recursiveCount, tListC *commandList, tListF *fileList);
+
+void cmd_listopen( tListF *fileList);
+
 void cmd_open(char *arguments[MAX], int nArguments, tListF *fileList);
 
 void cmd_close (char *arguments[MAX], tListF *fileList);
@@ -46,27 +53,31 @@ void cmd_dup (char *arguments[MAX], tListF *fileList);
 void cmd_help(char *arguments[MAX], int nArguments);
 
 
+
 int main() {
-    bool quit;
     char *cmd = NULL;
     char *arguments[MAX];
     int nArguments;
+    int recursiveCount = 0;
+    bool quit;
 
     tListC commandList;
     createListC(&commandList);
 
     tListF fileList;
     createListF(&fileList);
+
     if (!insertStdFiles(&fileList)) 
         exit(EXIT_FAILURE);
 
     do {
         printPrompt();
-        readInputs(cmd, arguments, &nArguments);
-    } while (processCommand(arguments, nArguments, &fileList));
+        readInputs(cmd, arguments, &nArguments, &commandList);
+        quit = processCommand(arguments, nArguments, &recursiveCount , &fileList, &commandList);
+        freeMemory(cmd, arguments, nArguments, &commandList, &fileList, quit);
+    } while (quit);
 
 
-    freeMemory(cmd, arguments, nArguments, &commandList, &fileList);
     return EXIT_SUCCESS;
 }
 
@@ -74,17 +85,71 @@ void printPrompt() {
     printf("-> ");
 }
 
-void readInputs(char *cmd, char *arguments[], int *nArguments) {
-    ssize_t bytesRead; // ssize_t y size_t son unsigned int
-    size_t bufferSize = 0;
+// void readInputs(char *cmd, char *arguments[], int *nArguments, tListC *commandList) {
+//     ssize_t bytesRead; // ssize_t y size_t son unsigned int
+//     size_t bufferSize = 0;
+//     char *inputCopy;
 
-    bytesRead = getline(&cmd, &bufferSize, stdin); // getline devuelve el número de bytes escritos si no hay errores
+//     bytesRead = getline(&cmd, &bufferSize, stdin); // getline devuelve el número de bytes escritos si no hay errores
+//     inputCopy = strdup(cmd);
 
-    if (bytesRead == -1) {
-        perror("Lectura fallida");
+//     inputCopy[strlen(inputCopy)-1] = '\0';
+
+
+//     if (bytesRead == -1 || !insertElementC(inputCopy, commandList)) {
+//         perror("Lectura fallida");
+//         exit(EXIT_FAILURE);
+//     }
+//     *nArguments = chopCmd(cmd, arguments);
+
+//     free(inputCopy);
+// }
+
+void readInputs(char* cmd, char *arguments[], int *nArguments, tListC *commandList) {
+    size_t stringSize= 0;
+    size_t newSize = 0;
+    char *inputCopy = NULL;
+    char *newCmd = NULL;
+    bool aux = true;
+    int actualCharacter;
+
+    if((cmd = (char *) malloc(BUFFER_SIZE)) == NULL) {
+        perror("Memory allocation error");
+        exit(EXIT_FAILURE);
+    }
+
+    while (aux) {
+        actualCharacter = getchar();
+        if (actualCharacter == '\n') {
+            cmd[stringSize] = '\0';
+            aux = false;
+        }
+        else {
+            cmd[stringSize] = (char)actualCharacter;
+            stringSize++;
+
+            if (stringSize == BUFFER_SIZE) {
+                newSize += BUFFER_SIZE;
+                printf("Reallocating memory...\n");
+                if (((newCmd = (char *) realloc(cmd, newSize))) == NULL) {
+                    perror("Memory reallocation error");
+                    exit(EXIT_FAILURE);
+                }
+                cmd = newCmd;
+                newCmd = NULL;
+            }
+        }
+    }
+
+    inputCopy = strdup(cmd);
+
+    if (!insertElementC(inputCopy, commandList)) {
+        perror("Insertion in file list failed");
         exit(EXIT_FAILURE);
     }
     *nArguments = chopCmd(cmd, arguments);
+
+    free(inputCopy);
 }
 
 int chopCmd(char *cmd, char *tokens[]) {
@@ -96,9 +161,13 @@ int chopCmd(char *cmd, char *tokens[]) {
     return i;
 }
 
-bool processCommand(char *arguments[MAX], int nArguments, tListF * fileList) {
-
-    if (strcmp(arguments[0], "authors") == 0)
+bool processCommand(char *arguments[MAX], int nArguments, int *recursiveCount, tListF * fileList, tListC * commandList) {
+    if(*recursiveCount > 10){
+        printf("Demasiada recursión en hist \n");
+        (*recursiveCount) = 0;
+        return true;
+    }
+    else if(strcmp(arguments[0], "authors") == 0)
         cmd_authors(arguments, nArguments);
     else if (strcmp(arguments[0], "pid") == 0)
         cmd_pid(arguments, nArguments);
@@ -110,33 +179,36 @@ bool processCommand(char *arguments[MAX], int nArguments, tListF * fileList) {
         cmd_date();
     else if (strcmp(arguments[0],"time")==0)
         cmd_time();
+    else if (strcmp(arguments[0],"listopen")==0)
+        cmd_listopen(fileList);
     else if (strcmp(arguments[0],"open")==0)
         cmd_open(arguments, nArguments, fileList);
     else if (strcmp(arguments[0],"close")==0)
         cmd_close(arguments, fileList);
     else if (strcmp(arguments[0],"dup")==0)
         cmd_dup(arguments, fileList);
+    else if (strcmp(arguments[0],"hist")==0)
+        cmd_hist(arguments, nArguments, commandList);
+    else if (strcmp(arguments[0],"command")==0)
+        cmd_command(arguments, nArguments, recursiveCount ,commandList, fileList);
 
-    else if ((strcmp(arguments[0], "quit") == 0) || (strcmp(arguments[0], "bye") == 0) ||
-             (strcmp(arguments[0], "exit") == 0))
+    else if ((strcmp(arguments[0], "quit") == 0) || (strcmp(arguments[0], "bye") == 0) || (strcmp(arguments[0], "exit") == 0))
         return false;
     else
         printf("No ejecutado: No such file or directory\n");
     return true;
 }
 
-void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *commandList, tListF *fileList) {
-    printf("Liberando...\n");
+void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *commandList, tListF *fileList, bool quit) {
     free(cmd);
-    for (int i = 0; i < nArguments; i++) {
+
+    if (!quit) {
+    for (int i = 0; i < nArguments; i++)
         free(arguments[i]);
-    }
 
     freeListF(fileList);
-    printf("Liberada lista de ficheros...\n");
-
-    // freeListC(commandList);
-    // printf("Liberada lista de comandos...\n");
+    freeListC(commandList);
+    }
 }
 
 /////////////////////////
@@ -145,7 +217,7 @@ void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *command
 
 void cmd_authors(char *arguments[MAX], int nArguments) {
     char authorsNames[] = "Santiago Daniel";
-    char authorsLogins[] = "s.garea@udc dani.queijo@udc";
+    char authorsLogins[] = "s.garea@udc daniel.queijo.seoane@udc";
 
     switch (nArguments) {
         case 1:
@@ -187,6 +259,7 @@ void cmd_chdir(char *arguments[MAX], int nArguments) {
     char *cwd = (char *) malloc(BUFFER_SIZE);
     if (cwd == NULL) {
         perror("Memory allocation error");
+        free(cwd);
         exit(EXIT_FAILURE);
     }
 
@@ -194,18 +267,22 @@ void cmd_chdir(char *arguments[MAX], int nArguments) {
         case 1:
             if (getcwd(cwd, BUFFER_SIZE) == NULL) {
                 perror("getcwd() error");
+                free(cwd);
                 exit(EXIT_FAILURE);
-            } else
+            } else {
                 printf("Current working directory: %s\n", cwd);
-            free(cwd);
+                free(cwd);
+            }
             break;
 
         case 2:
             chdir(arguments[1]);
+            free(cwd);
             break;
 
         default:
             printf("Error: Multiple arguments\n");
+            free(cwd);
             break;
     }
 }
@@ -230,6 +307,81 @@ void cmd_time(){
     printf("%02d:%02d:%02d\n", organizedTime.tm_hour,organizedTime.tm_min, organizedTime.tm_sec);
 }
 
+bool esEnteroPositivo(const char *cadena,int *numero){
+    if (*cadena == '\0')
+        return false;
+    char *temp;
+    *numero = (int)strtol(cadena,  &temp, 10);
+    if (temp != NULL && numero>=0)
+        return true;
+    else
+        return false;
+}
+
+void cmd_hist(char *arguments[MAX], int nArguments, tListC *commandList){
+    size_t len = sizeof(arguments[1])-1;
+    char *primerChar;
+    char restoDeLaCadena[len];
+    int numero;
+    switch (nArguments) {
+        case 1: //Mostrar historial
+            displayListC(*commandList);
+            break;
+        case 2:
+            primerChar = &arguments[1][0];
+            if(*primerChar == '-'){
+                strcpy(restoDeLaCadena, arguments[1] + 1);
+                if (restoDeLaCadena[len - 1] == '\n') {
+                    restoDeLaCadena[len - 1] = '\0'; // Reemplaza el '\n' con '\0'
+                }
+                if(strcmp(restoDeLaCadena, "c")==0){
+                    freeListC(commandList); //Borrar historial de comandos
+                }
+                else if (esEnteroPositivo(restoDeLaCadena, &numero)){
+                    displayNFirstElements(numero,*commandList); //Mostrar los N primeros elementos si se introduce un número natural positivo
+                }
+                else{
+                    printf("Error: Unexpected argument '%s' found\n", arguments[1]);
+                }
+            }
+            else{
+                printf("Error: Unexpected argument '%s' found\n", arguments[1]);
+            }
+            break;
+        default:
+            printf("Error: Multiple arguments\n");
+            break;
+    }
+}
+
+void cmd_command(char *arguments[MAX], int nArguments, int *recursiveCount, tListC *commandList, tListF *fileList){
+    int numero, nArgumentsHist;
+    tItemC command;
+    char *argumentsHist[MAX];
+    switch (nArguments) {
+        case 1:
+            printf("Necesitas especificar el número del comando que deseas repetir \n");
+            displayListC(*commandList);
+            break;
+        case 2:
+            if(esEnteroPositivo(arguments[1],&numero)){
+                command = strdup(getNthElement(numero,*commandList));
+                printf("Ejecutando hist (%d): %s \n",numero,command);
+                nArgumentsHist = chopCmd(command, argumentsHist);
+                (*recursiveCount)++;
+                processCommand(argumentsHist, nArgumentsHist, recursiveCount, fileList, commandList);
+                free(command);
+            }
+            else{
+                printf("Error: Unexpected argument '%s' found\n", arguments[1]);
+            }
+            break;
+        default:
+            printf("Error: Multiple arguments\n");
+            break;
+    }
+}
+
 void cmd_infosys(char *arguments[MAX], int nArguments) {
     struct utsname machineInfo;
 
@@ -240,15 +392,21 @@ void cmd_infosys(char *arguments[MAX], int nArguments) {
     printf("%s (%s), OS: %s-%s-%s\n",machineInfo.nodename,machineInfo.machine,machineInfo.sysname,machineInfo.release, machineInfo.version);
 }
 
+void cmd_listopen(tListF *fileList){
+    // Listar archivos abiertos
+    if (isEmptyF(*fileList))
+        printf("No hay archivos abiertos");
+    else 
+        displayListF(*fileList);
+}
+
 void cmd_open(char *arguments[MAX], int nArguments, tListF *fileList) {
     int i, fileDescriptor, mode = 0;
 
-    if (nArguments == 1) {
+    if (nArguments == 1)
         // Listar archivos abiertos
-        if (isEmptyF(*fileList))
-            printf("No hay archivos abiertos");
-        displayListF(*fileList);
-    } else {
+        cmd_listopen(fileList);
+    else {
 
         for (i = 2; arguments[i] != NULL; i++) {
             if (!strcmp(arguments[i], "cr"))
@@ -282,7 +440,7 @@ void cmd_close (char *arguments[MAX], tListF *fileList) {
     int fileDescriptor;
 
     if (arguments[1]==NULL || (fileDescriptor=atoi(arguments[1]))<0) {
-        displayListF(*fileList);
+        cmd_listopen(fileList);
         return;
     }
     if (close(fileDescriptor)==-1)
@@ -292,13 +450,13 @@ void cmd_close (char *arguments[MAX], tListF *fileList) {
     }
 }
 
-void cmd_dup (char *arguments[MAX], tListF *fileList) { 
+void cmd_dup (char *arguments[MAX], tListF *fileList) {
     int fileDescriptor, newFileDescriptor;
     tPosF file;
     char aux[MAX];
-    
+
     if (arguments[1]==NULL || (fileDescriptor=atoi(arguments[1]))<0) {
-        displayListF(*fileList);
+        cmd_listopen(fileList);
         return;
     }
     if ((file = findElementF(fileDescriptor, *fileList)) == NULL) {
@@ -311,3 +469,6 @@ void cmd_dup (char *arguments[MAX], tListF *fileList) {
     sprintf (aux,"dup %d (%s)",fileDescriptor, file->data.fileName);
     insertElementF((tItemF) {aux, newFileDescriptor, file->data.mode}, fileList);
 }
+
+
+
