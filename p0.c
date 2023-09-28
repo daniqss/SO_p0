@@ -158,8 +158,8 @@ void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *command
     freeListF(fileList);
     printf("Liberada lista de ficheros...\n");
 
-    // freeListC(commandList);
-    // printf("Liberada lista de comandos...\n");
+    freeListC(commandList);
+    printf("Liberada lista de comandos...\n");
 }
 
 /////////////////////////

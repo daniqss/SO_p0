@@ -78,8 +78,10 @@ void removeElementC(tPosC p, tListC *L) {
         p->data = q->data;
         p->next = q->next;
         p = q;
-    }        // Si queremos eliminar una posición intermedia duplicamos el siguiente nodo en esa posición y hacemos que "p" apunte al siguiente.
+    }    
+    free(p->data);    
     free(p); // Liberamos los datos de la posición.
+    // Si queremos eliminar una posición intermedia duplicamos el siguiente nodo en esa posición y hacemos que "p" apunte al siguiente.
 }
 
 tItemC getNthElement(int n, tListC L){
@@ -112,14 +114,12 @@ void displayListC(tListC L) {
 }
 
 void freeListC(tListC *L) {
-    tPosC p, q;
-    printf("Liberando lista de comandos\n");
+    tPosC p;
 
-    p = *L;
-
-    while (!isEmptyC(p)) {
-        q = nextC(p);
-        removeElementC(p, L);
-        p = q;
+    if(!isEmptyC(*L)) {
+        for(p=(*L); p!=CNULL; p=nextC(p)) { // Iteramos por todos los jurados de la lista.
+            printf("liberando %s\n", p->data);
+            removeElementC(p, L);
+        }
     }
 }

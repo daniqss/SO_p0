@@ -8,14 +8,17 @@ void createListF(tListF *L) {
     *L = NULL;
 }
 
+tPosF firstF(tListF L) {
+    return L;
+} // Devolvemos la primera posición
 
-tPosF nextF(tPosF pos, tListF L) {
-    return pos->next;
+tPosF nextF(tPosF p) {
+    return p->next;
 } // Devolvemos la posición siguiente
 
 tPosF lastF(tListF L) {
     tPosF p;
-    for (p = L; nextF(p, L) != FNULL; p = nextF(p, L));
+    for (p = L; nextF(p) != FNULL; p = nextF(p));
     return p;
 } // Buscamos la última posición y la devolvemos
 
@@ -57,14 +60,18 @@ bool insertElementF(tItemF item, tListF *L){
 
 void removeElementF(tPosF p, tListF *L) {
     tPosF q;
-    if (p == *L) // Si queremos eliminar la primera posición hacemos que la lista empiece en la siguiente
-        *L = nextF(*L, *L);
+    if (p == *L) 
+        *L = nextF(*L);
+        // Si queremos eliminar la primera posición hacemos que la lista empiece en la siguiente
+
     else if (p == lastF(*L)) {
-        for (q = *L; (q->next != FNULL) && (q->next != p); q = nextF(q, *L));
+        for (q = *L; (q->next != FNULL) && (q->next != p); q = nextF(q));
         q->next = FNULL;
-    } // Si queremos eliminar la última posición hacemos que la lista acabe en el penúltimo elemento
+        // Si queremos eliminar la última posición hacemos que la lista acabe en el penúltimo elemento
+        
+    }
     else {
-        q = nextF(p, *L);
+        q = nextF(p);
         strcpy(p->data.fileName, q->data.fileName);
         p->data.descriptor = q->data.descriptor;
         p->data.mode = q->data.mode;
@@ -72,6 +79,7 @@ void removeElementF(tPosF p, tListF *L) {
         p->next = q->next;
         p = q;
     }
+
     free(p->data.fileName);
     free(p);
 }
@@ -125,7 +133,7 @@ void displayListF(tListF L) {
     tPosF p;
     char *modeString;
 
-    for (p = L; p != FNULL; p = nextF(p, L)) {
+    for (p = L; p != FNULL; p = nextF(p)) {
         modeString = getModeString(p->data.mode);
         printf("descriptor: %d -> %s %s\n", p->data.descriptor,p->data.fileName, modeString);
         free(modeString);
@@ -133,13 +141,9 @@ void displayListF(tListF L) {
 }
 
 void freeListF(tListF *L) {
-    tPosF p;
-
-    if(!isEmptyF(*L)) {
-        for(p=(*L); p!=NULL; p=nextF(p,*L)) { // Iteramos por todos los jurados de la lista.
-            printf("liberando %s\n", p->data.fileName);
-            removeElementF(p, L);
-        }
+    while(!isEmptyF(*L)) {
+            printf("Eliminando %s\n", (*L)->data.fileName);
+            removeElementF(*L, L);
     }
 }
 
