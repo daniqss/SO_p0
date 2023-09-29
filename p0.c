@@ -70,15 +70,21 @@ void cmd_command(char *arguments[MAX_ARGUMENTS], int nArguments, int *recursiveC
  */
 void cmd_open(char *arguments[MAX_ARGUMENTS], int nArguments, tListF *fileList);
 /*
- *
+ * Permite abrir un archivo y añadirlo a la lista de archivos abiertos
+ * Le debemos pasar el nombre del fichero y el/los modos en los que queremos abrirlo
+ * Adicionalmente, si no le pasamos ningún parámetro muestra la lista de archivos abiertos
  */
 void cmd_close (char *arguments[MAX_ARGUMENTS], tListF *fileList);
-/*
- *
+/* 
+ * Permite cerrar un fichero abierto y eliminarlo de la lista de archivos abiertos
+ * Debemos pasarle como parámetro el descriptor del fichero que queremos cerrar
+ * Adicionalmente, si no le pasamos ningún parámetro muestra la lista de archivos abiertos
  */
 void cmd_dup (char *arguments[MAX_ARGUMENTS], tListF *fileList);
 /*
- *
+ * Permite duplicar el descriptor de fichero abierto y añadirlo a la lista de archivos abiertos
+ * Le debemos pasar el descriptor del fichero que queremos duplicar
+ * Adicionalmente, si no le pasamos ningún parámetro muestra la lista de archivos abiertos
  */
 void cmd_listopen( tListF *fileList);
 /*
@@ -136,9 +142,11 @@ void printPrompt() {
     char *userName = getenv("USER"); //Conseguimos el usuario del dispositvo
     char hostName[250];
     if (userName == NULL || gethostname(hostName, sizeof(hostName)) != 0)
-        printf("[?]>> "); //Si no obtenemos el usuario y nombre del dispositivo mostramos un interrogante por defecto
-    else
-        printf("[%s@%s]>> ", userName,hostName); //Formato : [usuario@nombreDelDispositivo]>>
+        printf("\033[1;31m[?]>> \033[0m"); //Si no obtenemos el usuario y nombre del dispositivo mostramos un interrogante por defecto
+    else {
+        printf("\033[1;32m");
+        printf("[%s@%s]>> \033[0m", userName, hostName); // Formato : [usuario@nombreDelDispositivo]>>
+    }
 }
 
 
@@ -159,7 +167,7 @@ bool readInputs(char cmd[MAX_BUFFER], char *arguments[], int *nArguments, tListC
             stringSize++;
 
             if (stringSize == MAX_BUFFER - 1) {
-                printf("\nBuffer size exceeded, extra characters will be ignore\n");
+                printf("\n\033[31mError:\033[0m buffer size exceeded, extra characters will be ignore\n");
                 printPrompt();
                 while ((actualCharacter = getchar()) != '\n' && actualCharacter != EOF)
                 aux = false; // Terminar la lectura
@@ -171,7 +179,7 @@ bool readInputs(char cmd[MAX_BUFFER], char *arguments[], int *nArguments, tListC
     strcpy(inputCopy, cmd);
 
     if (!insertElementC(inputCopy, commandList)) {
-        perror("Lectura fallida");
+        perror("\033[31mError:\033[0m read failed");
         free(inputCopy);
         exit(EXIT_FAILURE);
     }
@@ -226,7 +234,7 @@ bool processCommand(char *arguments[MAX_ARGUMENTS], int nArguments, int *recursi
     else if ((strcmp(arguments[0], "quit") == 0) || (strcmp(arguments[0], "bye") == 0) || (strcmp(arguments[0], "exit") == 0))
         return false;
     else
-        printf("No ejecutado: No such file or directory\n");
+        printf("\033[31mNo ejecutado: \033[0mNo such file or directory\n");
     return true;
 }
 
@@ -249,10 +257,10 @@ void cmd_authors(char *arguments[MAX_ARGUMENTS], int nArguments) {
             else if (strcmp(arguments[1], "-n") == 0)
                 printf("%s\n", authorsNames);
             else
-                printf("Error: Unexpected argument '%s' found\n", arguments[1]);
+                printf("\033[31mError:\033[0m Unexpected argument \033[33m'%s'\033[0m found\n", arguments[1]);
             break;
         default:
-            printf("Error: Multiple arguments\n");
+            printf("\033[31mError:\033[0m Multiple arguments\n");
             break;
     }
 }
@@ -267,10 +275,10 @@ void cmd_pid(char *arguments[MAX_ARGUMENTS], int nArguments) {
             if (strcmp(arguments[1], "-l") == 0)
                 printf("Current process parent identifier: %d\n", getppid());
             else
-                printf("Error: Unexpected argument '%s' found\n", arguments[1]);
+                printf("\033[31mError:\033[0m Unexpected argument '%s' found\n", arguments[1]);
             break;
         default:
-            printf("Error: Multiple arguments\n");
+            printf("\033[31mError:\033[0m Multiple arguments\n");
             break;
     }
 }
@@ -278,7 +286,7 @@ void cmd_pid(char *arguments[MAX_ARGUMENTS], int nArguments) {
 void cmd_chdir(char *arguments[MAX_ARGUMENTS], int nArguments) {
     char *cwd = (char *) malloc(MAX_BUFFER);
     if (cwd == NULL) {
-        perror("Memory allocation error");
+        perror("\033[31mError:\033[0m Memory allocation error");
         free(cwd);
         exit(EXIT_FAILURE);
     }
@@ -286,11 +294,11 @@ void cmd_chdir(char *arguments[MAX_ARGUMENTS], int nArguments) {
     switch (nArguments) {
         case 1:
             if (getcwd(cwd, MAX_BUFFER) == NULL) {
-                perror("getcwd() error");
+                perror("\033[31mError:\033[0m getcwd() error");
                 free(cwd);
                 exit(EXIT_FAILURE);
             } else {
-                printf("Current working directory: %s\n", cwd);
+                printf("Current working directory:\033[34m %s\n\033[0m", cwd);
                 free(cwd);
             }
             break;
@@ -301,7 +309,7 @@ void cmd_chdir(char *arguments[MAX_ARGUMENTS], int nArguments) {
             break;
 
         default:
-            printf("Error: Multiple arguments\n");
+            printf("\033[31mError:\033[0m Multiple arguments\n");
             free(cwd);
             break;
     }
@@ -361,14 +369,14 @@ void cmd_hist(char *arguments[MAX_ARGUMENTS], int nArguments, tListC *commandLis
                 } else if (esEnteroPositivo(restoDeLaCadena, &numero)) {
                     displayNFirstElements(numero, *commandList); // Mostrar los N primeros elementos si se introduce un número natural positivo
                 } else {
-                    printf("Error: Unexpected argument '%s' found\n", arguments[1]);
+                    printf("\033[31mError:\033[0m Unexpected argument \033[33m'%s'\033[0m found\n", arguments[1]);
                 }
             } else {
-                printf("Error: Unexpected argument '%s' found\n", arguments[1]);
+                printf("\033[31mError:\033[0m Unexpected argument \033[33m'%s'\033[0m found\n", arguments[1]);
             }
             break;
         default:
-            printf("Error: Multiple arguments\n");
+            printf("\033[31mError:\033[0m Multiple arguments\n");
             break;
     }
 }
@@ -396,12 +404,11 @@ void cmd_command(char *arguments[MAX_ARGUMENTS], int nArguments, int *recursiveC
                 }
                 free(command);
             }
-            else{
-                printf("Error: Unexpected argument '%s' found\n", arguments[1]);
-            }
+            else
+                printf("\033[31mError:\033[0m Unexpected argument '%s' found\n", arguments[1]);
             break;
         default:
-            printf("Error: Multiple arguments\n");
+            printf("\033[31mError:\033[0m Multiple arguments\n");
             break;
     }
 }
@@ -410,7 +417,7 @@ void cmd_infosys(char *arguments[MAX_ARGUMENTS], int nArguments) {
     struct utsname machineInfo;
 
     if (uname(&machineInfo) == -1) {
-        perror("ename error");
+        perror("\033[31mError:\033[0m ename error");
         exit(EXIT_FAILURE);
     }
     printf("%s (%s), OS: %s-%s-%s\n",machineInfo.nodename,machineInfo.machine,machineInfo.sysname,machineInfo.release, machineInfo.version);
@@ -451,11 +458,11 @@ void cmd_open(char *arguments[MAX_ARGUMENTS], int nArguments, tListF *fileList) 
                 break;
         }
         if ((fileDescriptor = open(arguments[1], mode, 0777)) == -1)
-            perror("Imposible abrir fichero: No such file or directory");
+            perror("\033[31mImposible abrir fichero:\033[0m No such file or directory");
         else {
             insertElementF((tItemF) {arguments[1], fileDescriptor, mode}, fileList);
 
-            printf("Añadida entrada %d a la tabla de ficheros abiertos\n", fileDescriptor);
+            printf("Añadida entrada \033[33m%d\033[0m a la tabla de ficheros abiertos\n", fileDescriptor);
         }
     }
 }
@@ -468,7 +475,7 @@ void cmd_close (char *arguments[MAX_ARGUMENTS], tListF *fileList) {
         return;
     }
     if (close(fileDescriptor)==-1)
-        perror("Imposible cerrar descriptor");
+        perror("\033[31mError:\033[0m Imposible cerrar descriptor");
     else {
         removeElementF(findElementF(fileDescriptor, *fileList), fileList);
     }
@@ -484,13 +491,13 @@ void cmd_dup (char *arguments[MAX_ARGUMENTS], tListF *fileList) {
         return;
     }
     if ((file = findElementF(fileDescriptor, *fileList)) == NULL) {
-        printf("Imposible duplicar descriptor: Bad file descriptor\n");
+        perror("\033[31mImposible duplicar descriptor: \033[0m Bad file descriptor\n");
         return;
     }
     fileDescriptor = file->data.descriptor;
     newFileDescriptor = dup(fileDescriptor);
 
-    sprintf (aux,"dup %d (%s)",fileDescriptor, file->data.fileName);
+    sprintf (aux,"dup \033[33m%d\033[0m (\033[34m%s\033[0m)",fileDescriptor, file->data.fileName);
     insertElementF((tItemF) {aux, newFileDescriptor, file->data.mode}, fileList);
 }
 

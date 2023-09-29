@@ -133,7 +133,7 @@ void displayListF(tListF L) {
 
     for (p = L; p != FNULL; p = nextF(p)) {
         modeString = getModeString(p->data.mode);
-        printf("descriptor: %d -> %s %s\n", p->data.descriptor,p->data.fileName, modeString);
+        printf("descriptor: \033[33m%d\033[0m -> \033[34m%s\033[0m %s\n", p->data.descriptor,p->data.fileName, modeString);
         free(modeString);
     } // Recorremos la lista y mostramos cada elemento
 }

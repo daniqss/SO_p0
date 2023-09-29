@@ -109,7 +109,7 @@ void displayNFirstElements(int n, tListC L) {
     tPosC p;
     int cnt=0;
     for (p = L; p!= CNULL && cnt != n ; p = nextC(p)) {
-        printf("%d -> %s \n",cnt, p->data);
+        printf("\033[33m%d\033[0m -> \033[34m%s\033[0m \n",cnt, p->data);
         cnt = cnt + 1;
     } // Recorremos la lista y mostramos cada elemento
 }
@@ -119,7 +119,7 @@ void displayListC(tListC L) {
     tPosC p;
     int cnt=0;
     for (p = L; p!= CNULL; p = nextC(p)) {
-        printf("%d -> %s \n",cnt, p->data);
+        printf("\033[33m%d\033[0m -> \033[34m%s\033[0m \n",cnt, p->data);
         cnt = cnt + 1;
     } // Recorremos la lista y mostramos cada elemento
 }
