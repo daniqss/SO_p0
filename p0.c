@@ -11,52 +11,98 @@
 #include "command_list.h"
 #include<time.h>
 
-#define MAX 1024
-#define BUFFER_SIZE 1024
+#define MAX_ARGUMENTS 1024
+#define MAX_BUFFER 1024
 
-void readInputs(char *cmd, char *arguments[], int *nArguments, tListC *commandList); //Lee las entradas
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DECLARACIÓN~~~DE~~~FUNCIONES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-int chopCmd(char *cmd, char *tokens[]); //Divide a entrada de comandos
+bool readInputs(char cmd[MAX_BUFFER], char *arguments[], int *nArguments, tListC *commandList);
+//Lee los inputs del usuarios
 
-void printPrompt(); //Imprime Prompt
+int chopCmd(char cmd[MAX_BUFFER], char *tokens[]);
+//Divide el input en palabras
 
-bool processCommand(char *arguments[MAX], int nArguments, int * recursiveCount, tListF * fileList, tListC * comandList);
+void printPrompt();
+//Imprime Prompt (Salida por defecto)
 
-void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *commandList, tListF *fileList, bool quit);
+bool processCommand(char *arguments[MAX_ARGUMENTS], int nArguments, int * recursiveCount, tListF * fileList, tListC * comandList);
+//Identifica a que comando se refiere la entrada y lo llama.
 
-//Comandos
-
-void cmd_authors(char *arguments[MAX], int nArguments);
-
-void cmd_pid(char *arguments[MAX], int nArguments);
-
-void cmd_chdir(char *arguments[MAX], int nArguments);
-
+void cmd_authors(char *arguments[MAX_ARGUMENTS], int nArguments);
+/*
+ * Muestra el nombre y los logins los autores del programa
+ * Adicionalmente, si agregamos a la entrada un:
+ *  -l Muestra solo los logins
+ *  -n Muestra solo los nombres
+ */
+void cmd_pid(char *arguments[MAX_ARGUMENTS], int nArguments);
+/*
+ * Muestra el pid del proceso que se está ejecutando en el shell:
+ * Adicionalmente, si agregamos a la entrada un:
+ *  -p Muestra el pid del proceso padre del proceso
+ */
+void cmd_chdir(char *arguments[MAX_ARGUMENTS], int nArguments);
+/*
+ * Cambia la dirección de trabajo del shell por la que se le indique.
+ * Adicionalmente, si no se le indica ningunha dirección muestra la dirección actual.
+ */
 void cmd_date();
-
+/*
+ * Muestra la fecha actual.
+ */
 void cmd_time();
-
-void cmd_infosys(char *arguments[MAX], int nArguments);
-
-void cmd_hist(char *arguments[MAX], int nArguments, tListC *commandList);
-
-void cmd_command(char *arguments[MAX], int nArguments, int *recursiveCount, tListC *commandList, tListF *fileList);
-
+/*
+ * Muestra la hora actual.
+ */
+void cmd_hist(char *arguments[MAX_ARGUMENTS], int nArguments, tListC *commandList);
+/*
+ * Muestra todos los comandos ejecutados en el programa por orden (historial de comando)
+ * Adicionalmente, si agregamos a la entrada un:
+ *  -c Borra el historial en vez de mostrarlo
+ *  -N (siendo N un número natural) muestra los N primeros comandos.
+ */
+void cmd_command(char *arguments[MAX_ARGUMENTS], int nArguments, int *recursiveCount, tListC *commandList, tListF *fileList);
+/*
+ * Ejecuta el comando número N (siendo N un número natural)
+ *
+ */
+void cmd_open(char *arguments[MAX_ARGUMENTS], int nArguments, tListF *fileList);
+/*
+ *
+ */
+void cmd_close (char *arguments[MAX_ARGUMENTS], tListF *fileList);
+/*
+ *
+ */
+void cmd_dup (char *arguments[MAX_ARGUMENTS], tListF *fileList);
+/*
+ *
+ */
 void cmd_listopen( tListF *fileList);
+/*
+ * Muestra la lista de archivos abiertos
+ */
+void cmd_infosys(char *arguments[MAX_ARGUMENTS], int nArguments);
+/*
+ * Muestra la información de la máquina que ejecuta el shell
+ */
+void cmd_help(char *arguments[MAX_ARGUMENTS], int nArguments);
+/*
+ * Muestra la lista de comandos disponibles del shell
+ * Adicionalmente, si agregamos a la entrada un comando muestra una descripción sobre lo que hace ese comando
+ */
 
-void cmd_open(char *arguments[MAX], int nArguments, tListF *fileList);
-
-void cmd_close (char *arguments[MAX], tListF *fileList);
-
-void cmd_dup (char *arguments[MAX], tListF *fileList);
-
-void cmd_help(char *arguments[MAX], int nArguments);
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~PROGRAMA~~~~PRINCIPAL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 
 int main() {
-    char *cmd = NULL;
-    char *arguments[MAX];
+    char cmd[MAX_BUFFER];
+    char *arguments[MAX_ARGUMENTS];
     int nArguments;
     int recursiveCount = 0;
     bool quit;
@@ -72,43 +118,70 @@ int main() {
 
     do {
         printPrompt();
-        readInputs(cmd, arguments, &nArguments, &commandList);
-        quit = processCommand(arguments, nArguments, &recursiveCount , &fileList, &commandList);
-
-        freeMemory(cmd, arguments, nArguments, &commandList, &fileList, quit);
+        quit = readInputs(cmd, arguments, &nArguments, &commandList);
+        if (quit)
+            quit = processCommand(arguments, nArguments, &recursiveCount , &fileList, &commandList);
     } while (quit);
 
+    freeListC(&commandList);
+    freeListF(&fileList);
     return EXIT_SUCCESS;
 }
 
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DEFINICIÓN~~~DE~~~FUNCIONES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
 void printPrompt() {
-    printf("-> ");
+    char *userName = getenv("USER"); //Conseguimos el usuario del dispositvo
+    char hostName[250];
+    if (userName == NULL || gethostname(hostName, sizeof(hostName)) != 0)
+        printf("[?]>> "); //Si no obtenemos el usuario y nombre del dispositivo mostramos un interrogante por defecto
+    else
+        printf("[%s@%s]>> ", userName,hostName); //Formato : [usuario@nombreDelDispositivo]>>
 }
 
-void readInputs(char *cmd, char *arguments[], int *nArguments, tListC *commandList) {
-    ssize_t bytesRead; // ssize_t y size_t son unsigned int
-    size_t bufferSize = 0;
+
+bool readInputs(char cmd[MAX_BUFFER], char *arguments[], int *nArguments, tListC *commandList) {
+    size_t stringSize = 0;
+    bool aux = true;
+    int actualCharacter;
     char *inputCopy;
+    
 
-    bytesRead = getline(&cmd, &bufferSize, stdin); // getline devuelve el número de bytes escritos si no hay errores
-    cmd[bytesRead - 1] = '\0';
-    inputCopy = strdup(cmd);
+    while (aux) {
+        actualCharacter = getchar();
+        if (actualCharacter == '\n' || actualCharacter == EOF) {
+            cmd[stringSize] = '\0';
+            aux = false;
+        } else {
+            cmd[stringSize] = (char)actualCharacter;
+            stringSize++;
 
+            if (stringSize == MAX_BUFFER - 1) {
+                printf("\nBuffer size exceeded, extra characters will be ignore\n");
+                printPrompt();
+                while ((actualCharacter = getchar()) != '\n' && actualCharacter != EOF)
+                aux = false; // Terminar la lectura
+            }
+        }
+    }
 
-    if (bytesRead == -1 || !insertElementC(inputCopy, commandList)) {
+    inputCopy = (char *) malloc(strlen(cmd) + 1);
+    strcpy(inputCopy, cmd);
+
+    if (!insertElementC(inputCopy, commandList)) {
         perror("Lectura fallida");
+        free(inputCopy);
         exit(EXIT_FAILURE);
     }
+    free(inputCopy);
 
-    *nArguments = chopCmd(inputCopy, arguments);
-
-    if (inputCopy != NULL) {
-        free(inputCopy);
-        inputCopy = NULL;
-    }
+    *nArguments = chopCmd(cmd, arguments);
+    return true;
 }
 
-int chopCmd(char *cmd, char *tokens[]) {
+int chopCmd(char cmd[MAX_BUFFER], char *tokens[]) {
     int i = 1;
     if ((tokens[0] = strtok(cmd, " \n\t")) == NULL)
         return 0;
@@ -117,24 +190,7 @@ int chopCmd(char *cmd, char *tokens[]) {
     return i;
 }
 
-// int chopCmd(char *cmd, char *tokens[]) {
-//     int i = 1;
-//     char *token;
-
-//     if ((token = strtok(cmd, " \n\t")) == NULL)
-//         return 0;
-
-//     tokens[0] = strdup(token);
-
-//     while ((token = strtok(NULL, " \n\t")) != NULL) {
-//         tokens[i] = strdup(token);
-//         i++;
-//     }
-
-//     return i;
-// }
-
-bool processCommand(char *arguments[MAX], int nArguments, int *recursiveCount, tListF * fileList, tListC * commandList) {
+bool processCommand(char *arguments[MAX_ARGUMENTS], int nArguments, int *recursiveCount, tListF * fileList, tListC * commandList) {
     if(*recursiveCount > 10){
         printf("Demasiada recursión en hist \n");
         (*recursiveCount) = 0;
@@ -172,31 +228,12 @@ bool processCommand(char *arguments[MAX], int nArguments, int *recursiveCount, t
     return true;
 }
 
-void freeMemory(char *cmd, char *arguments[MAX], int nArguments, tListC *commandList, tListF *fileList, bool quit) {
-    // for (int i = 0; i < nArguments; i++) {
-    //     if (arguments[i] != NULL) {
-    //         free(arguments[i]);
-    //         arguments[i] = NULL;
-    //         printf("liberado arguments[%d]\n", i);
-    //     }
-    // }
-    if (cmd != NULL) {
-        free(cmd);
-        cmd = NULL;
-        printf("liberado cmd\n");
-    }
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~COMANDOS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    if (!quit) {
-        freeListF(fileList);
-        freeListC(commandList);
-    }
-}
 
-/////////////////////////
-// COMANDOS  ////////////
-/////////////////////////
-
-void cmd_authors(char *arguments[MAX], int nArguments) {
+void cmd_authors(char *arguments[MAX_ARGUMENTS], int nArguments) {
     char authorsNames[] = "Santiago Daniel";
     char authorsLogins[] = "s.garea@udc daniel.queijo.seoane@udc";
 
@@ -218,7 +255,7 @@ void cmd_authors(char *arguments[MAX], int nArguments) {
     }
 }
 
-void cmd_pid(char *arguments[MAX], int nArguments) {
+void cmd_pid(char *arguments[MAX_ARGUMENTS], int nArguments) {
 
     switch (nArguments) {
         case 1:
@@ -236,8 +273,8 @@ void cmd_pid(char *arguments[MAX], int nArguments) {
     }
 }
 
-void cmd_chdir(char *arguments[MAX], int nArguments) {
-    char *cwd = (char *) malloc(BUFFER_SIZE);
+void cmd_chdir(char *arguments[MAX_ARGUMENTS], int nArguments) {
+    char *cwd = (char *) malloc(MAX_BUFFER);
     if (cwd == NULL) {
         perror("Memory allocation error");
         free(cwd);
@@ -246,7 +283,7 @@ void cmd_chdir(char *arguments[MAX], int nArguments) {
 
     switch (nArguments) {
         case 1:
-            if (getcwd(cwd, BUFFER_SIZE) == NULL) {
+            if (getcwd(cwd, MAX_BUFFER) == NULL) {
                 perror("getcwd() error");
                 free(cwd);
                 exit(EXIT_FAILURE);
@@ -299,7 +336,7 @@ bool esEnteroPositivo(const char *cadena,int *numero){
         return false;
 }
 
-void cmd_hist(char *arguments[MAX], int nArguments, tListC *commandList){
+void cmd_hist(char *arguments[MAX_ARGUMENTS], int nArguments, tListC *commandList){
     size_t len = sizeof(arguments[1])-1;
     char *primerChar;
     char restoDeLaCadena[len];
@@ -335,10 +372,10 @@ void cmd_hist(char *arguments[MAX], int nArguments, tListC *commandList){
     }
 }
 
-void cmd_command(char *arguments[MAX], int nArguments, int *recursiveCount, tListC *commandList, tListF *fileList){
+void cmd_command(char *arguments[MAX_ARGUMENTS], int nArguments, int *recursiveCount, tListC *commandList, tListF *fileList){
     int numero, nArgumentsHist;
     tItemC command;
-    char *argumentsHist[MAX];
+    char *argumentsHist[MAX_ARGUMENTS];
     switch (nArguments) {
         case 1:
             printf("Necesitas especificar el número del comando que deseas repetir \n");
@@ -363,7 +400,7 @@ void cmd_command(char *arguments[MAX], int nArguments, int *recursiveCount, tLis
     }
 }
 
-void cmd_infosys(char *arguments[MAX], int nArguments) {
+void cmd_infosys(char *arguments[MAX_ARGUMENTS], int nArguments) {
     struct utsname machineInfo;
 
     if (uname(&machineInfo) == -1) {
@@ -381,7 +418,7 @@ void cmd_listopen(tListF *fileList){
         displayListF(*fileList);
 }
 
-void cmd_open(char *arguments[MAX], int nArguments, tListF *fileList) {
+void cmd_open(char *arguments[MAX_ARGUMENTS], int nArguments, tListF *fileList) {
     int i, fileDescriptor, mode = 0;
 
     if (nArguments == 1)
@@ -417,7 +454,7 @@ void cmd_open(char *arguments[MAX], int nArguments, tListF *fileList) {
     }
 }
 
-void cmd_close (char *arguments[MAX], tListF *fileList) {
+void cmd_close (char *arguments[MAX_ARGUMENTS], tListF *fileList) {
     int fileDescriptor;
 
     if (arguments[1]==NULL || (fileDescriptor=atoi(arguments[1]))<0) {
@@ -431,10 +468,10 @@ void cmd_close (char *arguments[MAX], tListF *fileList) {
     }
 }
 
-void cmd_dup (char *arguments[MAX], tListF *fileList) {
+void cmd_dup (char *arguments[MAX_ARGUMENTS], tListF *fileList) {
     int fileDescriptor, newFileDescriptor;
     tPosF file;
-    char aux[MAX];
+    char aux[MAX_ARGUMENTS];
 
     if (arguments[1]==NULL || (fileDescriptor=atoi(arguments[1]))<0) {
         cmd_listopen(fileList);
