@@ -1,3 +1,9 @@
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AUTORES: Santiago Garea Bestilleiro (s.garea@udc.es)
+         Daniel Queijo Seoane (daniel.queijo.seoane@udc.es)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdbool.h>
@@ -245,7 +251,7 @@ bool processCommand(char *arguments[MAX_ARGUMENTS], int nArguments, int *recursi
 
 void cmd_authors(char *arguments[MAX_ARGUMENTS], int nArguments) {
     char authorsNames[] = "Santiago Daniel";
-    char authorsLogins[] = "s.garea@udc daniel.queijo.seoane@udc";
+    char authorsLogins[] = "s.garea@udc.es daniel.queijo.seoane@udc.es";
 
     switch (nArguments) {
         case 1:
