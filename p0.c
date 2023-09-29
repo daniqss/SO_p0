@@ -220,6 +220,8 @@ bool processCommand(char *arguments[MAX_ARGUMENTS], int nArguments, int *recursi
         cmd_hist(arguments, nArguments, commandList);
     else if (strcmp(arguments[0],"command")==0)
         cmd_command(arguments, nArguments, recursiveCount ,commandList, fileList);
+    else if (strcmp(arguments[0],"help")==0)
+        cmd_help(arguments,nArguments);
 
     else if ((strcmp(arguments[0], "quit") == 0) || (strcmp(arguments[0], "bye") == 0) || (strcmp(arguments[0], "exit") == 0))
         return false;
@@ -329,12 +331,12 @@ bool esEnteroPositivo(const char *cadena,int *numero){
     if (*cadena == '\0')
         return false;
     char *temp;
-    *numero = (int)strtol(cadena,  &temp, 10);
-    if (temp != NULL && numero>=0)
+    *numero = (int)strtol(cadena,  &temp, 10); //Guarda los números y en temp el resto de caracteres
+    if (*temp == '\0' && *numero >= 0) //Si no hay otros caracteres o el número es mayor igual que cero devolvemos true.
         return true;
     else
         return false;
-}
+}//Función auxiliar que comprueba si una cadena está compuesta solo de dígitos (por lo tanto un número positivo).
 
 void cmd_hist(char *arguments[MAX_ARGUMENTS], int nArguments, tListC *commandList){
     size_t len = sizeof(arguments[1])-1;
@@ -383,11 +385,15 @@ void cmd_command(char *arguments[MAX_ARGUMENTS], int nArguments, int *recursiveC
             break;
         case 2:
             if(esEnteroPositivo(arguments[1],&numero)){
-                command = strdup(getNthElement(numero,*commandList));
-                printf("Ejecutando hist (%d): %s \n",numero,command);
-                nArgumentsHist = chopCmd(command, argumentsHist);
-                (*recursiveCount)++;
-                processCommand(argumentsHist, nArgumentsHist, recursiveCount, fileList, commandList);
+                if(!getNthElement(numero,*commandList,&command)) //Comprueba si existe el Nth elemento en la lista
+                    printf("No hay elemento %d en el historico \n",numero);
+                else{
+                    command = strdup(command); //Duplicamos la lista, para evitar los problemas de memoria
+                    printf("Ejecutando hist (%d): %s \n",numero,command);
+                    nArgumentsHist = chopCmd(command, argumentsHist); //Conseguimos el número de argumentos
+                    (*recursiveCount)++; //Aumentamos el contador de recursividad
+                    processCommand(argumentsHist, nArgumentsHist, recursiveCount, fileList, commandList);
+                }
                 free(command);
             }
             else{
@@ -488,5 +494,61 @@ void cmd_dup (char *arguments[MAX_ARGUMENTS], tListF *fileList) {
     insertElementF((tItemF) {aux, newFileDescriptor, file->data.mode}, fileList);
 }
 
+void cmd_help(char *arguments[MAX_ARGUMENTS], int nArguments) {
+    char *comando = arguments[1];
+    switch (nArguments) {
+        case 1:
+            printf("'help [cmd]' ayuda sobre comandos\n"
+                   "\t\tComandos disponibles: \n");
+            printf("exit bye fin quit help infosys listopen dup close open command hist time date chdir pid authors \n");
+            break;
+        case 2:
+            if (strcmp(comando, "time") == 0) {
+                printf("time \t Muestra la hora actual\n");
+            } else if (strcmp(comando, "date") == 0) {
+                printf("date\tMuestra la fecha actual\n");
+            } else if (strcmp(comando, "hist") == 0) {
+                printf("hist [-c|-N]\tMuestra (o borra) el historial de comandos\n");
+                printf(" \t -N: muestra los N primeros\n");
+                printf(" \t -c: borra el historial\n");
+            } else if (strcmp(comando, "command") == 0) {
+                printf("command [-N] \t Repite el comando N (del historial)\n");
+            } else if (strcmp(comando, "open") == 0) {
+                printf("open fich m1 m2... \t Abre el fichero fich. y lo añade a la lista de ficheros abiertos del shell\n");
+                printf("\tm1, m2... es el modo de apertura (or bit a bit de los siguientes).\n");
+                printf("\tcr: O_CREAT\tap: O_APPEND\n");
+                printf("\tex: O_EXCL \tro: O_RDONLY\n");
+                printf("\trw: O_RDWR \two: O_WRONLY\n");
+                printf("\ttr: O_TRUNC\n");
+            } else if (strcmp(comando, "close") == 0) {
+                    printf("close df \t Cierra el descriptor df y elimina el correspondiente fichero de la lista de ficheros abiertos\n");
+            } else if (strcmp(comando, "dup") == 0) {
+                printf("dup df \t Duplica el descriptor de fichero df y añade una nueva entrada a la lista de ficheros abiertos\n");
+            } else if (strcmp(comando, "listopen") == 0) {
+                printf("listopen [n] \t Lista los ficheros abiertos (al menos n) del shell\n");
+            } else if (strcmp(comando, "infosys") == 0) {
+                printf("infosys\tMuestra información de la máquina donde corre el shell\n");
+            } else if (strcmp(comando, "help") == 0) {
+                printf("help [cmd|-lt|-T] \t Muestra ayuda sobre los comandos\n");
+                printf("\tcmd: info sobre el comando cmd\n");
+            } else if (strcmp(comando, "quit") == 0 || strcmp(comando, "exit") == 0 || strcmp(comando, "bye") == 0) {
+                printf("%s\tTermina la ejecución del shell\n", comando);
+            } else if (strcmp(comando, "chdir") == 0) {
+                printf("chdir [dir] \t Cambia (o muestra) el directorio actual del shell\n");
+            } else if (strcmp(comando, "pid") == 0) {
+                printf("pid [-p] \t Muestra el PID del shell o de su proceso padre\n");
+                printf("\t-p: muestra el PID del proceso padre\n");
+            } else if (strcmp(comando, "authors") == 0) {
+                printf("authors [-n|-l] \t Muestra los nombres y/o logins de los autores\n");
+                printf("\t-n: muestra solo los nombres de los autores\n");
+                printf("\t-l: muestra solo los logins de los autores\n");
+            }
+            break;
+        default:
+            printf("Comando desconocido: %s\n", comando);
+            break;
+    }
+
+}
 
 

@@ -90,15 +90,20 @@ void removeElementC(tPosC p, tListC *L) {
     // Si queremos eliminar una posición intermedia duplicamos el siguiente nodo en esa posición y hacemos que "p" apunte al siguiente.
 }
 
-tItemC getNthElement(int n, tListC L){
+
+bool getNthElement(int n, tListC L, tItemC *item){
     tPosC p;
-    tItemC item;
     int cnt=0;
-    for (p = L; p!= CNULL && cnt != n ; p = nextC(p))
+    for (p = L; (p!= CNULL) && (cnt != n) ; p = nextC(p))
         cnt = cnt + 1;
-    item = p->data;
-    return item;
+    if (p!=CNULL){
+        *item = p->data;
+        return true;
+    }
+    else
+        return false;
 }
+
 
 void displayNFirstElements(int n, tListC L) {
     tPosC p;
