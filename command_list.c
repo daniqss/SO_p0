@@ -92,10 +92,10 @@ void removeElementC(tPosC p, tListC *L) {
 
 
 bool getNthElement(int n, tListC L, tItemC *item){
-    tPosC p;
+    tPosC p = NULL;
     int cnt=0;
     for (p = L; (p!= CNULL) && (cnt != n) ; p = nextC(p))
-        cnt = cnt + 1;
+        cnt++;
     if (p!=CNULL){
         *item = p->data;
         return true;

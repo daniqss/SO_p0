@@ -339,32 +339,31 @@ bool esEnteroPositivo(const char *cadena,int *numero){
 }//Función auxiliar que comprueba si una cadena está compuesta solo de dígitos (por lo tanto un número positivo).
 
 void cmd_hist(char *arguments[MAX_ARGUMENTS], int nArguments, tListC *commandList){
-    size_t len = sizeof(arguments[1])-1;
     char *primerChar;
-    char restoDeLaCadena[len];
     int numero;
+    char *restoDeLaCadena;
+    int length;
+
     switch (nArguments) {
-        case 1: //Mostrar historial
+        case 1: // Mostrar historial
             displayListC(*commandList);
             break;
         case 2:
             primerChar = &arguments[1][0];
-            if(*primerChar == '-'){
-                strcpy(restoDeLaCadena, arguments[1] + 1);
-                if (restoDeLaCadena[len - 1] == '\n') {
-                    restoDeLaCadena[len - 1] = '\0'; // Reemplaza el '\n' con '\0'
+            if (*primerChar == '-') {
+                restoDeLaCadena = arguments[1] + 1;
+                length = strlen(restoDeLaCadena) - 1;
+                if (restoDeLaCadena[length] == '\n') {
+                    restoDeLaCadena[length] = '\0'; // Reemplaza el '\n' con '\0'
                 }
-                if(strcmp(restoDeLaCadena, "c")==0){
-                    freeListC(commandList); //Borrar historial de comandos
-                }
-                else if (esEnteroPositivo(restoDeLaCadena, &numero)){
-                    displayNFirstElements(numero,*commandList); //Mostrar los N primeros elementos si se introduce un número natural positivo
-                }
-                else{
+                if (strcmp(restoDeLaCadena, "c") == 0) {
+                    freeListC(commandList); // Borrar historial de comandos
+                } else if (esEnteroPositivo(restoDeLaCadena, &numero)) {
+                    displayNFirstElements(numero, *commandList); // Mostrar los N primeros elementos si se introduce un número natural positivo
+                } else {
                     printf("Error: Unexpected argument '%s' found\n", arguments[1]);
                 }
-            }
-            else{
+            } else {
                 printf("Error: Unexpected argument '%s' found\n", arguments[1]);
             }
             break;
@@ -374,9 +373,10 @@ void cmd_hist(char *arguments[MAX_ARGUMENTS], int nArguments, tListC *commandLis
     }
 }
 
+
 void cmd_command(char *arguments[MAX_ARGUMENTS], int nArguments, int *recursiveCount, tListC *commandList, tListF *fileList){
     int numero, nArgumentsHist;
-    tItemC command;
+    tItemC command = NULL;
     char *argumentsHist[MAX_ARGUMENTS];
     switch (nArguments) {
         case 1:
